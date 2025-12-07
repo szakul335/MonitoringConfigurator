@@ -1,0 +1,68 @@
+@model MonitoringConfigurator.Models.Configuration
+@{
+    ViewData["Title"] = "Konfigurator";
+}
+<h2>Konfigurator – rozszerzony</h2>
+@if (TempData["Error"] is string err)
+{
+  <div class="alert alert-danger">@err</div>
+}
+<form asp-action="Propose" method="post" class="row g-3">
+  <div class="col-md-3">
+    <label class="form-label">Liczba kamer</label>
+    <input asp-for="CameraCount" class="form-control" />
+    <span asp-validation-for="CameraCount" class="text-danger"></span>
+  </div>
+  <div class="col-md-3">
+    <label class="form-label">Rozdzielczość (MP)</label>
+    <input asp-for="RequiredResolutionMp" class="form-control" />
+  </div>
+  <div class="col-md-3">
+    <label class="form-label">Klatki/s</label>
+    <input asp-for="FrameRateFps" class="form-control" />
+  </div>
+  <div class="col-md-3">
+    <label class="form-label">Retencja (dni)</label>
+    <input asp-for="RetentionDays" class="form-control" />
+  </div>
+  <div class="col-md-3">
+    <label class="form-label">% kamer zewnętrznych</label>
+    <input asp-for="PercentOutdoor" class="form-control" />
+  </div>
+  <div class="col-md-3">
+    <label class="form-label">Wymagany zasięg IR (m)</label>
+    <input asp-for="RequiredIrRangeM" class="form-control" />
+  </div>
+  <div class="col-md-3">
+    <label class="form-label">Długość kabla / kamera (m)</label>
+    <input asp-for="CableLengthPerCameraM" class="form-control" />
+  </div>
+  <div class="col-md-3">
+    <label class="form-label">% ruchu w scenie</label>
+    <input asp-for="ExpectedMotionPercent" class="form-control" />
+  </div>
+  <div class="col-md-3">
+    <label class="form-label">PoE na kamerę (W)</label>
+    <input asp-for="PoePerCameraW" class="form-control" />
+  </div>
+  <div class="col-md-3">
+    <label class="form-label">Czas podtrzymania UPS (min)</label>
+    <input asp-for="UptimeMinutesUPS" class="form-control" />
+  </div>
+  <div class="col-md-3 form-check mt-4">
+    <input class="form-check-input" type="checkbox" asp-for="UseAnalytics" id="analyticsCheck">
+    <label class="form-check-label" for="analyticsCheck">Analityka (IVA)</label>
+  </div>
+  <div class="col-md-3 form-check mt-4">
+    <input class="form-check-input" type="checkbox" asp-for="UseRaid" id="raidCheck">
+    <label class="form-check-label" for="raidCheck">Użyj RAID</label>
+  </div>
+  <div class="col-12">
+    <button class="btn btn-danger">Zaproponuj konfigurację</button>
+  </div>
+</form>
+@section Scripts{
+  <partial name="_ValidationScriptsPartial" />
+}
+
+<style>body{background:#0d0f12;color:#e5e7eb}.btn-danger{background:#ff3b30;border-color:#ff3b30}</style>

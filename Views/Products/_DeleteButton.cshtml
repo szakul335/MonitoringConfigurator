@@ -1,0 +1,8 @@
+@model int
+<form action="@Url.Action("Delete","Products")" method="post" class="d-inline">
+    @Html.AntiForgeryToken()
+    <input type="hidden" name="id" value="@Model" />
+    <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Usunąć produkt?');">
+        <i class="bi bi-trash"></i> Usuń
+    </button>
+</form>

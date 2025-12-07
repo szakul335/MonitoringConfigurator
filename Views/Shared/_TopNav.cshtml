@@ -1,0 +1,93 @@
+@* _TopNav.cshtml — pasek nawigacji *@
+@using Microsoft.AspNetCore.Identity
+@inject UserManager<IdentityUser> UserManager
+
+@{
+    var isAuth = User?.Identity?.IsAuthenticated ?? false;
+    var userName = User?.Identity?.Name ?? "";
+
+  
+    var isAdmin = User.IsInRole("Admin")
+                  || string.Equals(userName, "admin@demo.pl", System.StringComparison.OrdinalIgnoreCase);
+
+    var isOperator = User.IsInRole("Operator")
+                     || string.Equals(userName, "operator@demo.pl", System.StringComparison.OrdinalIgnoreCase);
+}
+
+<nav class="navbar navbar-expand-lg navbar-dark" style="background:#111; border-bottom:1px solid #1f1f1f;">
+    <div class="container">
+        <a class="navbar-brand" asp-controller="Home" asp-action="Index">MonitoringConfigurator</a>
+
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Przełącz nawigację">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="mainNav">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+
+                @* tylko zalogowani widzą Konfigurator *@
+                @if (isAuth)
+                {
+                    <li class="nav-item"><a class="nav-link" asp-controller="Configurator" asp-action="Index">Konfigurator</a></li>
+                }
+
+                <li class="nav-item"><a class="nav-link" asp-controller="Products" asp-action="Index">Produkty</a></li>
+                <li class="nav-item"><a class="nav-link" asp-controller="Info" asp-action="About">O nas</a></li>
+                <li class="nav-item"><a class="nav-link" asp-controller="Info" asp-action="Contact">Kontakt</a></li>
+                <li class="nav-item"><a class="nav-link" asp-controller="Info" asp-action="Faq">FAQ</a></li>
+                <li class="nav-item"><a class="nav-link" asp-controller="Info" asp-action="Guides">Instrukcje</a></li>
+                <li class="nav-item"><a class="nav-link" asp-controller="Info" asp-action="Opinions">Opinie</a></li>
+                <li class="nav-item"><a class="nav-link" asp-controller="Info" asp-action="Support">Wsparcie</a></li>
+
+                @* Admin-only *@
+                @if (isAdmin)
+                {
+                    <li class="nav-item"><a class="nav-link" asp-controller="Users" asp-action="Index">Użytkownicy</a></li>
+                    
+                }
+
+                @* Wiadomości dla Admin LUB Operator *@
+                @if (isAdmin || isOperator)
+                {
+                    <li class="nav-item"><a class="nav-link" asp-controller="Messages" asp-action="Index">Wiadomości</a></li>
+                }
+
+                @* Moje dokumenty — dla zalogowanych *@
+                @if (isAuth)
+                {
+                    <li class="nav-item"><a class="nav-link" asp-controller="Documents" asp-action="Index">Moje dokumenty</a></li>
+                }
+            </ul>
+
+            <ul class="navbar-nav ms-auto">
+                @if (isAuth)
+                {
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="kontoDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Witaj, @userName
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="kontoDropdown">
+                            <li><a class="dropdown-item" asp-area="Identity" asp-page="/Account/Manage/Index">Moje konto</a></li>
+                            <li><hr class="dropdown-divider" /></li>
+                            <li>
+                                <form class="px-3" asp-area="Identity" asp-page="/Account/Logout" method="post">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn btn-sm btn-outline-danger w-100">Wyloguj</button>
+                                </form>
+                            </li>
+                        </ul>
+                    </li>
+                }
+                else
+                {
+                    <li class="nav-item me-2">
+                        <a class="btn btn-sm btn-outline-light" asp-area="Identity" asp-page="/Account/Login">Zaloguj się</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="btn btn-sm btn-primary" asp-area="Identity" asp-page="/Account/Register">Zarejestruj się</a>
+                    </li>
+                }
+            </ul>
+        </div>
+    </div>
+</nav>

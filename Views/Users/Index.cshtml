@@ -1,0 +1,69 @@
+
+@model IEnumerable<MonitoringConfigurator.Controllers.UsersController.UserVm>
+@{
+    ViewData["Title"] = "Użytkownicy";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var search = ViewBag.Search as string;
+}
+<h2 class="mb-3">Użytkownicy</h2>
+
+<form method="get" class="d-flex gap-2 mb-3">
+  <input type="text" name="search" value="@search" class="form-control" placeholder="Szukaj po emailu / loginie" />
+  <button class="btn btn-outline-secondary">Szukaj</button>
+</form>
+
+<div class="table-responsive">
+<table class="table table-hover align-middle">
+  <thead class="table-light">
+    <tr>
+      <th>Email / Login</th>
+      <th>Rola</th>
+      <th class="text-end">Akcje</th>
+    </tr>
+  </thead>
+  <tbody>
+  @foreach (var u in Model)
+  {
+    <tr>
+      <td>@u.Email</td>
+      <td>@(u.IsAdmin ? "Admin" : (u.IsOperator ? "Operator" : "Użytkownik"))</td>
+      <td class="text-end">
+        @if (!u.IsAdmin)
+        {
+          <form method="post" action="@Url.Action("MakeAdmin","Users")" class="d-inline">@Html.AntiForgeryToken()
+            <input type="hidden" name="id" value="@u.Id" />
+            <button class="btn btn-sm btn-outline-primary" type="submit"><i class="bi bi-shield-check"></i> Nadaj Admin</button>
+          </form>
+        }
+        else
+        {
+          <form method="post" action="@Url.Action("RemoveAdmin","Users")" class="d-inline">@Html.AntiForgeryToken()
+            <input type="hidden" name="id" value="@u.Id" />
+            <button class="btn btn-sm btn-outline-warning" type="submit"><i class="bi bi-shield-slash"></i> Zabierz Admin</button>
+          </form>
+        }
+
+        @if (!u.IsOperator)
+        {
+          <form method="post" action="@Url.Action("MakeOperator","Users")" class="d-inline">@Html.AntiForgeryToken()
+            <input type="hidden" name="id" value="@u.Id" />
+            <button class="btn btn-sm btn-outline-info" type="submit"><i class="bi bi-person-gear"></i> Nadaj Operator</button>
+          </form>
+        }
+        else
+        {
+          <form method="post" action="@Url.Action("RemoveOperator","Users")" class="d-inline">@Html.AntiForgeryToken()
+            <input type="hidden" name="id" value="@u.Id" />
+            <button class="btn btn-sm btn-outline-secondary" type="submit"><i class="bi bi-person-dash"></i> Zabierz Operator</button>
+          </form>
+        }
+        <form method="post" action="@Url.Action("Delete","Users")" class="d-inline">@Html.AntiForgeryToken()
+          <input type="hidden" name="id" value="@u.Id" />
+          <button class="btn btn-sm btn-outline-danger" type="submit" onclick="return confirm('Usunąć użytkownika?');"><i class="bi bi-trash"></i> Usuń</button>
+        </form>
+      </td>
+    </tr>
+  }
+  </tbody>
+</table>
+</div>

@@ -1,0 +1,91 @@
+
+@model MonitoringConfigurator.Models.Product
+@using MonitoringConfigurator.Models
+@{
+    ViewData["Title"] = "Szczegóły produktu";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<style>
+/* Skalowanie przycisków edycji/zarządzania */
+.btn-action{font-weight:600;border-radius:999px;padding:.45rem .9rem}
+@@media (min-width:576px){.btn-action{padding:.5rem 1rem}}
+@@media (min-width:768px){.btn-action{padding:.55rem 1.05rem}}
+@@media (min-width:992px){.btn-action{padding:.6rem 1.15rem}}
+.btn-action i{margin-right:.35rem}
+</style>
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h2 class="m-0">Produkt: @Model.Name</h2>
+  <div class="d-flex gap-2">
+    <a href="@Url.Action("Create","Products")" class="btn btn-success btn-action">
+      <i class="bi bi-plus-circle"></i> Dodaj produkt
+    </a>
+    <a href="@Url.Action("Edit","Products", new { id = Model.Id })" class="btn btn-outline-primary btn-action">
+      <i class="bi bi-pencil"></i> Edytuj
+    </a>
+    <form action="@Url.Action("Delete","Products")" method="post" class="d-inline">
+      @Html.AntiForgeryToken()
+      <input type="hidden" name="id" value="@Model.Id" />
+      <button type="submit" class="btn btn-outline-danger btn-action" onclick="return confirm('Usunąć ten produkt?');">
+        <i class="bi bi-trash"></i> Usuń
+      </button>
+    </form>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-lg-8">
+    <div class="card shadow-sm mb-3">
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-6">
+            <div><span class="text-muted">Producent:</span> <strong>@Model.Brand</strong></div>
+            <div><span class="text-muted">Model:</span> <strong>@Model.Model</strong></div>
+            <div><span class="text-muted">Kategoria:</span> <strong>@Model.Category</strong></div>
+          </div>
+          <div class="col-md-6 text-md-end">
+            <div><span class="text-muted">Cena:</span> <strong>@Model.Price.ToString("0.00")</strong></div>
+            <div><span class="text-muted">Stan:</span> <strong>@Model.Stock</strong></div>
+          </div>
+        </div>
+        @if (!string.IsNullOrWhiteSpace(Model.Description))
+        {
+            <hr />
+            <div>
+              <div class="fw-semibold mb-1">Opis</div>
+              <div>@Model.Description</div>
+            </div>
+        }
+        <hr />
+        <div>
+          <div class="d-flex justify-content-between align-items-center">
+            <div class="fw-semibold mb-1">Rozszerzony opis</div>
+            <div>
+              <a href="@Url.Action("Edit","Products", new { id = Model.Id })#LongDescription" class="btn btn-outline-primary btn-action">Edytuj opis</a>
+              <form action="@Url.Action("ClearLongDescription","Products")" method="post" class="d-inline">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="id" value="@Model.Id" />
+                <button type="submit" class="btn btn-outline-danger btn-action" onclick="return confirm('Usunąć rozszerzony opis?');">Usuń opis</button>
+              </form>
+            </div>
+          </div>
+          <div class="text-muted small mb-2">Może zawierać szczegóły techniczne, scenariusze użycia itp.</div>
+          <div class="border rounded p-3 bg-light" style="white-space:pre-wrap">@Model.LongDescription</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-4">
+    <div class="card shadow-sm">
+      <div class="card-body text-center">
+        @if (!string.IsNullOrWhiteSpace(Model.ImageUrl))
+        {
+            <img src="@Model.ImageUrl" alt="@Model.Name" class="img-fluid rounded mb-3" />
+        }
+        <div class="text-muted">ID: @Model.Id</div>
+      </div>
+    </div>
+  </div>
+</div>

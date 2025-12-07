@@ -1,0 +1,103 @@
+@{
+    ViewData["Title"] = "O nas";
+}
+
+<style>
+    body {
+        background: #0f0f10;
+        color: #e5e7eb;
+    }
+    .card {
+        background: #151518;
+        border: 1px solid #2b2b2b;
+    }
+    a, .link { color: #ff3b30; }
+    .btn-danger { background: #ff3b30; border-color: #ff3b30; }
+    .form-control, .form-select { background: #121214; border-color: #2a2a2a; color: #e5e7eb; }
+    hr { border-color: #2a2a2a; }
+    .kpi { font-size: 2rem; font-weight: 700; }
+    .muted { color:#9ca3af; }
+</style>
+
+<div class="container mt-4">
+    <h1 class="mb-3">O nas</h1>
+    <div class="card p-4 mb-4">
+        <p>
+            Jesteśmy zespołem inżynierów i pasjonatów bezpieczeństwa, który od 2012 roku tworzy nowoczesne i niezawodne systemy monitoringu.
+            Naszą misją jest zapewnienie bezpieczeństwa w prosty i przejrzysty sposób – od pierwszego etapu
+            projektowania, przez dobór sprzętu, aż po gotowy system działający u klienta.
+        </p>
+        <p>
+            Działamy w całej Polsce – od małych instalacji domowych, przez sklepy i biura, aż po rozległe systemy przemysłowe.
+            Współpracujemy z wiodącymi producentami (m.in. Hikvision, Dahua, BCS, Uniview), a nasze wdrożenia obejmują setki obiektów.
+        </p>
+    </div>
+
+    <!-- Historia -->
+    <div class="row g-3 mb-4">
+        <div class="col-12 col-lg-6">
+            <div class="card h-100 p-4">
+                <h5 class="mb-3">Nasza historia</h5>
+                <ul class="mb-0">
+                    <li><strong>2012</strong> – start firmy i pierwsze instalacje dla domów i małych sklepów.</li>
+                    <li><strong>2016</strong> – wdrożenia dla sieci handlowych, pierwsze projekty w halach logistycznych.</li>
+                    <li><strong>2019</strong> – rozwój działu R&amp;D i uruchomienie <em>Konfiguratora CCTV</em>.</li>
+                    <li><strong>2022</strong> – integracje z systemami SSWiN i KD, wdrożenia AI/ANPR.</li>
+                    <li><strong>dziś</strong> – kompleksowe projekty „pod klucz” i stałe wsparcie serwisowe 24/7.</li>
+                </ul>
+            </div>
+        </div>
+        <div class="col-12 col-lg-6">
+            <div class="card h-100 p-4">
+                <h5 class="mb-3">Co robimy</h5>
+                <ul class="mb-0">
+                    <li><strong>Projektowanie i doradztwo</strong> – audyt, koncepcja, dobór sprzętu.</li>
+                    <li><strong>Montaż i konfiguracja</strong> – instalacje w obiektach wewnętrznych i zewnętrznych.</li>
+                    <li><strong>Serwis i utrzymanie</strong> – SLA, przeglądy, reakcja na zgłoszenia.</li>
+                    <li><strong>Modernizacje i integracje</strong> – wymiana sprzętu, łączenie z SSWiN i kontrolą dostępu.</li>
+                    <li><strong>Szkolenia</strong> – obsługa systemu, dobre praktyki bezpieczeństwa.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Liczby -->
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-lg-3"><div class="card p-4 text-center"><div class="kpi">12+</div><div class="muted">lat na rynku</div></div></div>
+        <div class="col-6 col-lg-3"><div class="card p-4 text-center"><div class="kpi">700+</div><div class="muted">zakończonych projektów</div></div></div>
+        <div class="col-6 col-lg-3"><div class="card p-4 text-center"><div class="kpi">4h</div><div class="muted">średni czas reakcji SLA</div></div></div>
+        <div class="col-6 col-lg-3"><div class="card p-4 text-center"><div class="kpi">99,5%</div><div class="muted">skuteczności serwisu</div></div></div>
+    </div>
+
+    <!-- Dlaczego my -->
+    <div class="card p-4 mb-4">
+        <h5 class="mb-3">Dlaczego my?</h5>
+        <div class="row g-3">
+            <div class="col-md-6">
+                <ul class="mb-0">
+                    <li>Dobór urządzeń pod cel – nie pod markę.</li>
+                    <li>Konfigurator CCTV, który skraca czas projektowania z godzin do minut.</li>
+                    <li>Transparentne oferty – jasny podział kosztów sprzętu i instalacji.</li>
+                </ul>
+            </div>
+            <div class="col-md-6">
+                <ul class="mb-0">
+                    <li>Wsparcie po wdrożeniu – zdalna diagnostyka, aktualizacje, przeglądy.</li>
+                    <li>Zespół certyfikowanych instalatorów i inżynierów presales.</li>
+                    <li>Elastyczne warunki współpracy dla integratorów i firm.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- CTA -->
+    <div class="card p-4 d-flex flex-lg-row flex-column align-items-lg-center justify-content-between gap-3">
+        <div>
+            <h5 class="mb-1">Masz pytania lub chcesz wycenę?</h5>
+            <p class="mb-0 muted">Napisz do nas – przygotujemy propozycję dopasowaną do Twojego obiektu.</p>
+        </div>
+        <div>
+            <a class="btn btn-danger" asp-controller="Info" asp-action="Support">Przejdź do wsparcia</a>
+        </div>
+    </div>
+</div>

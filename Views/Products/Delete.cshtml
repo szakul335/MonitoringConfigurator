@@ -1,0 +1,11 @@
+@model MonitoringConfigurator.Models.Product
+@{
+    ViewData["Title"] = "Usuń produkt";
+}
+<h3>Czy na pewno usunąć: @Model.Name ?</h3>
+<form asp-action="Delete" method="post">
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="Id" />
+    <button type="submit" class="btn btn-danger">Usuń</button>
+    <a asp-action="Index" class="btn btn-secondary">Anuluj</a>
+</form>

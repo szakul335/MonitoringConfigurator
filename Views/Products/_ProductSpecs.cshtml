@@ -1,0 +1,44 @@
+
+@model MonitoringConfigurator.Models.Product
+@using MonitoringConfigurator.Models
+
+@{
+    var specs = new List<(string Label, string? Value)>();
+    string fmtInt(int? v, string unit = "") => v.HasValue ? (v.Value.ToString() + (string.IsNullOrEmpty(unit) ? "" : $" {unit}")) : null;
+    string fmtDouble(double? v, string unit = "") => v.HasValue ? (v.Value.ToString("0.##") + (string.IsNullOrEmpty(unit) ? "" : $" {unit}")) : null;
+
+    specs.Add(("Rozdzielczość", fmtInt(Model.ResolutionMp, "MP")));
+    specs.Add(("IR", fmtInt(Model.IrRangeM, "m")));
+    specs.Add(("Outdoor", Model.Outdoor.HasValue ? (Model.Outdoor.Value ? "Tak" : "Nie") : null));
+    specs.Add(("Kanały (NVR)", fmtInt(Model.Channels)));
+    specs.Add(("Max bitrate", fmtInt(Model.MaxBandwidthMbps, "Mbps")));
+    specs.Add(("Zatoki dysków", fmtInt(Model.DiskBays)));
+    specs.Add(("Max HDD", fmtInt(Model.MaxHddTB, "TB")));
+    specs.Add(("RAID", Model.SupportsRaid.HasValue ? (Model.SupportsRaid.Value ? "Tak" : "Nie") : null));
+    specs.Add(("Porty (Switch)", fmtInt(Model.Ports)));
+    specs.Add(("Budżet PoE", fmtInt(Model.PoeBudgetW, "W")));
+    specs.Add(("Długość rolki", fmtInt(Model.RollLengthM, "m")));
+    specs.Add(("Pojemność", fmtDouble(Model.StorageTB, "TB")));
+    specs.Add(("Moc UPS", fmtInt(Model.UpsVA, "VA")));
+    // Usuń puste
+    specs = specs.Where(s => !string.IsNullOrWhiteSpace(s.Value)).ToList();
+}
+
+@if (specs.Any())
+{
+  <div class="row row-cols-1 row-cols-md-2 g-2">
+    @foreach (var s in specs)
+    {
+      <div class="col">
+        <div class="d-flex justify-content-between border rounded p-2 bg-dark bg-opacity-25">
+          <span class="text-muted">@s.Label</span>
+          <span class="fw-semibold">@s.Value</span>
+        </div>
+      </div>
+    }
+  </div>
+}
+else
+{
+  <div class="text-muted">Brak danych specyfikacji.</div>
+}
