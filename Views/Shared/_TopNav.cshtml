@@ -1,4 +1,3 @@
-@* _TopNav.cshtml — pasek nawigacji *@
 @using Microsoft.AspNetCore.Identity
 @inject UserManager<IdentityUser> UserManager
 
@@ -6,7 +5,6 @@
     var isAuth = User?.Identity?.IsAuthenticated ?? false;
     var userName = User?.Identity?.Name ?? "";
 
-  
     var isAdmin = User.IsInRole("Admin")
                   || string.Equals(userName, "admin@demo.pl", System.StringComparison.OrdinalIgnoreCase);
 
@@ -16,7 +14,7 @@
 
 <nav class="navbar navbar-expand-lg navbar-dark" style="background:#111; border-bottom:1px solid #1f1f1f;">
     <div class="container">
-        <a class="navbar-brand" asp-controller="Home" asp-action="Index">MonitoringConfigurator</a>
+        <a class="navbar-brand" asp-controller="Home" asp-action="Index">System Monitoring</a>
 
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Przełącz nawigację">
             <span class="navbar-toggler-icon"></span>
@@ -25,13 +23,8 @@
         <div class="collapse navbar-collapse" id="mainNav">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
 
-                @* tylko zalogowani widzą Konfigurator *@
-                @if (isAuth)
-                {
-                    <li class="nav-item"><a class="nav-link" asp-controller="Configurator" asp-action="Index">Konfigurator</a></li>
-                }
+                @* USUNIĘTO: Linki do Konfiguratora i Produktów *@
 
-                <li class="nav-item"><a class="nav-link" asp-controller="Products" asp-action="Index">Produkty</a></li>
                 <li class="nav-item"><a class="nav-link" asp-controller="Info" asp-action="About">O nas</a></li>
                 <li class="nav-item"><a class="nav-link" asp-controller="Info" asp-action="Contact">Kontakt</a></li>
                 <li class="nav-item"><a class="nav-link" asp-controller="Info" asp-action="Faq">FAQ</a></li>
@@ -43,7 +36,6 @@
                 @if (isAdmin)
                 {
                     <li class="nav-item"><a class="nav-link" asp-controller="Users" asp-action="Index">Użytkownicy</a></li>
-                    
                 }
 
                 @* Wiadomości dla Admin LUB Operator *@
