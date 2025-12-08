@@ -3,7 +3,7 @@
 @using Microsoft.AspNetCore.Mvc.ViewFeatures
 @{
     ViewData["Title"] = "Panel produktów";
-    var formViewData = new ViewDataDictionary(ViewData)
+
     {
         TemplateInfo = new TemplateInfo { HtmlFieldPrefix = "EditableProduct" }
     };
@@ -69,7 +69,7 @@
                                         <td>@item.Category</td>
                                         <td>@item.Price.ToString("C")</td>
                                         <td>
-                                            <a class="btn btn-sm btn-outline-primary" asp-action="Manage" asp-route-id="@item.Id" asp-route-category="@Model.Category" asp-route-query="@Model.Query" asp-fragment="productForm">Edytuj</a>
+
                                         </td>
                                     </tr>
                                 }
