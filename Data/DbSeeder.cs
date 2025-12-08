@@ -25,6 +25,28 @@ namespace MonitoringConfigurator.Data
                 await ctx.Database.EnsureCreatedAsync();
             }
 
+            // Upewnij się, że kolumna ShortDescription istnieje nawet, gdy migracja nie została zastosowana
+            await ctx.Database.ExecuteSqlRawAsync(@"
+                IF NOT EXISTS (
+                    SELECT 1 FROM sys.columns
+                    WHERE Name = 'ShortDescription' AND Object_ID = OBJECT_ID('Products')
+                )
+                BEGIN
+                    ALTER TABLE [Products] ADD [ShortDescription] NVARCHAR(300) NULL;
+                END
+            ");
+
+            // Usuń starą kolumnę Price, jeśli wciąż istnieje
+            await ctx.Database.ExecuteSqlRawAsync(@"
+                IF EXISTS (
+                    SELECT 1 FROM sys.columns
+                    WHERE Name = 'Price' AND Object_ID = OBJECT_ID('Products')
+                )
+                BEGIN
+                    ALTER TABLE [Products] DROP COLUMN [Price];
+                END
+            ");
+
             // Seedowanie użytkownika Admin (tylko jeśli nie istnieje)
             var um = sp.GetRequiredService<UserManager<IdentityUser>>();
             var adminEmail = "admin@demo.pl";
