@@ -25,6 +25,26 @@ namespace MonitoringConfigurator.Data
                 await ctx.Database.EnsureCreatedAsync();
             }
 
+            // Upewnij się, że kolumny ShortDescription i Price istnieją nawet, gdy migracje nie zostały zastosowane
+            await ctx.Database.ExecuteSqlRawAsync(@"
+                IF NOT EXISTS (
+                    SELECT 1 FROM sys.columns
+                    WHERE Name = 'ShortDescription' AND Object_ID = OBJECT_ID('Products')
+                )
+                BEGIN
+                    ALTER TABLE [Products] ADD [ShortDescription] NVARCHAR(300) NULL;
+                END
+
+                IF NOT EXISTS (
+                    SELECT 1 FROM sys.columns
+                    WHERE Name = 'Price' AND Object_ID = OBJECT_ID('Products')
+                )
+                BEGIN
+                    ALTER TABLE [Products] ADD [Price] DECIMAL(18, 2) NOT NULL CONSTRAINT DF_Products_Price DEFAULT 0;
+                    ALTER TABLE [Products] DROP CONSTRAINT DF_Products_Price;
+                END
+            ");
+
             // Seedowanie użytkownika Admin (tylko jeśli nie istnieje)
             var um = sp.GetRequiredService<UserManager<IdentityUser>>();
             var adminEmail = "admin@demo.pl";

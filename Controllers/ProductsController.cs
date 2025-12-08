@@ -32,6 +32,20 @@ namespace MonitoringConfigurator.Controllers
             return View(vm);
         }
 
+        public async Task<IActionResult> Details(int id)
+        {
+            var product = await _context.Products
+                .AsNoTracking()
+                .FirstOrDefaultAsync(p => p.Id == id);
+
+            if (product == null)
+            {
+                return NotFound();
+            }
+
+            return View(product);
+        }
+
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Manage(int? id, ProductCategory? category, string? query)
         {
@@ -42,7 +56,7 @@ namespace MonitoringConfigurator.Controllers
 
             var editableProduct = id.HasValue
                 ? await _context.Products.FindAsync(id.Value)
-                : new Product { Price = 0 };
+                : new Product();
 
             if (id.HasValue && editableProduct == null)
             {
@@ -122,7 +136,7 @@ namespace MonitoringConfigurator.Controllers
         [Authorize(Roles = "Admin")]
         public IActionResult Create()
         {
-            return View(new Product { Price = 0 });
+            return View(new Product());
         }
 
         [HttpPost]
@@ -175,6 +189,8 @@ namespace MonitoringConfigurator.Controllers
 
         private IQueryable<Product> BuildFilteredQuery(ProductCategory? category, string? query)
         {
+            EnsureProductColumns();
+
             var products = _context.Products.AsQueryable();
 
             if (category.HasValue)
@@ -191,6 +207,53 @@ namespace MonitoringConfigurator.Controllers
             }
 
             return products;
+        }
+
+        private static bool _productColumnsEnsured;
+        private static readonly object _ensureColumnsLock = new();
+
+        private void EnsureProductColumns()
+        {
+            if (_productColumnsEnsured)
+            {
+                return;
+            }
+
+            lock (_ensureColumnsLock)
+            {
+                if (_productColumnsEnsured)
+                {
+                    return;
+                }
+
+                try
+                {
+                    _context.Database.ExecuteSqlRaw(@"
+                        IF NOT EXISTS (
+                            SELECT 1 FROM sys.columns
+                            WHERE Name = 'ShortDescription' AND Object_ID = OBJECT_ID('Products')
+                        )
+                        BEGIN
+                            ALTER TABLE [Products] ADD [ShortDescription] NVARCHAR(300) NULL;
+                        END
+
+                        IF NOT EXISTS (
+                            SELECT 1 FROM sys.columns
+                            WHERE Name = 'Price' AND Object_ID = OBJECT_ID('Products')
+                        )
+                        BEGIN
+                            ALTER TABLE [Products] ADD [Price] DECIMAL(18, 2) NOT NULL CONSTRAINT DF_Products_Price DEFAULT 0;
+                            ALTER TABLE [Products] DROP CONSTRAINT DF_Products_Price;
+                        END
+                    ");
+                }
+                catch
+                {
+                    // If we cannot enforce the columns here, let the subsequent query surface the issue.
+                }
+
+                _productColumnsEnsured = true;
+            }
         }
     }
 }
