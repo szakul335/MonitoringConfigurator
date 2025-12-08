@@ -34,9 +34,6 @@ namespace MonitoringConfigurator.Models
         [DataType(DataType.Currency)]
         public decimal Price { get; set; }
 
-        [Range(0, 100_000)]
-        public int Stock { get; set; }
-
         [StringLength(2000)]
         public string? Description { get; set; }
 
