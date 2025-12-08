@@ -20,7 +20,10 @@
             }
             <div class="card-body">
                 <span class="badge bg-secondary mb-2">@Model.Category</span>
+
                 <p class="h5 fw-semibold mb-2">@Model.Price.ToString("C")</p>
+
+
                 @if (!string.IsNullOrWhiteSpace(Model.ShortDescription))
                 {
                     <p class="mb-0 text-secondary">@Model.ShortDescription</p>

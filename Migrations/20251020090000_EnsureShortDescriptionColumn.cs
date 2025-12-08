@@ -19,6 +19,17 @@ namespace MonitoringConfigurator.Migrations
                     ALTER TABLE [Products] ADD [ShortDescription] NVARCHAR(300) NULL;
                 END
             ");
+
+            migrationBuilder.Sql(@"
+                IF EXISTS (
+                    SELECT 1 FROM sys.columns
+                    WHERE Name = 'Price' AND Object_ID = OBJECT_ID('Products')
+                )
+                BEGIN
+                    ALTER TABLE [Products] DROP COLUMN [Price];
+                END
+            ");
+
         }
 
         /// <inheritdoc />
@@ -31,6 +42,18 @@ namespace MonitoringConfigurator.Migrations
                 )
                 BEGIN
                     ALTER TABLE [Products] DROP COLUMN [ShortDescription];
+                END
+            ");
+
+
+            migrationBuilder.Sql(@"
+                IF NOT EXISTS (
+                    SELECT 1 FROM sys.columns
+                    WHERE Name = 'Price' AND Object_ID = OBJECT_ID('Products')
+                )
+                BEGIN
+                    ALTER TABLE [Products] ADD [Price] DECIMAL(18, 2) NOT NULL CONSTRAINT DF_Products_Price DEFAULT 0;
+                    ALTER TABLE [Products] DROP CONSTRAINT DF_Products_Price;
                 END
             ");
         }
