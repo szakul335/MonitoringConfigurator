@@ -356,14 +356,15 @@ namespace MonitoringConfigurator.Migrations
                     b.Property<int?>("Ports")
                         .HasColumnType("int");
 
-                    b.Property<decimal>("Price")
-                        .HasColumnType("decimal(18,2)");
-
                     b.Property<int?>("ResolutionMp")
                         .HasColumnType("int");
 
                     b.Property<int?>("RollLengthM")
                         .HasColumnType("int");
+
+                    b.Property<string>("ShortDescription")
+                        .HasMaxLength(300)
+                        .HasColumnType("nvarchar(300)");
 
                     b.Property<double?>("StorageTB")
                         .HasColumnType("float");
