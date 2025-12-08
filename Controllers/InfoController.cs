@@ -32,86 +32,14 @@ namespace MonitoringConfigurator.Controllers
         [HttpGet, AllowAnonymous]
         public IActionResult Guides() => View();
 
-
-        // Wsparcie – formularz
-        [Authorize]
-        [HttpGet]
-        public async Task<IActionResult> Support()
-        {
-            var user = await _userManager.GetUserAsync(User);
-            if (user == null)
-            {
-                return Challenge();
-            }
-
-            var sent = await _ctx.Contacts
-                .Where(c => c.UserId == user.Id)
-                .OrderByDescending(c => c.CreatedAt)
-                .Take(200)
-                .ToListAsync();
-
-            var vm = new SupportViewModel { Recipient = "Admin", Sent = sent };
-            return View(vm);
-        }
-
-        // Wsparcie – wysyłka
-        [Authorize]
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Support(SupportViewModel model)
-        {
-            var user = await _userManager.GetUserAsync(User);
-            if (!ModelState.IsValid)
-            {
-                if (user == null)
-                {
-                    return Challenge();
-                }
-
-                // również załaduj historię wysłanych, żeby tabela się wyświetliła
-                model.Sent = await _ctx.Contacts
-                    .Where(c => c.UserId == user.Id)
-                    .OrderByDescending(c => c.CreatedAt)
-                    .Take(200)
-                    .ToListAsync();
-                return View(model);
-            }
-
-            if (user == null)
-            {
-                return Challenge();
-            }
-
-            var prefix = model.Recipient == "Operator" ? "[Operator] " : "[Admin] ";
-            var contact = new Contact
-            {
-                UserId = user.Id,
-                Subject = prefix + model.Subject,
-                Message = model.Message
-            };
-            _ctx.Contacts.Add(contact);
-            await _ctx.SaveChangesAsync();
-
-            ViewBag.Success = "Wiadomość została wysłana.";
-
-            // Odtwórz model z odświeżoną listą wysłanych
-            var sent = await _ctx.Contacts
-                .Where(c => c.UserId == user.Id)
-                .OrderByDescending(c => c.CreatedAt)
-                .Take(200)
-                .ToListAsync();
-
-            var vm = new SupportViewModel { Recipient = model.Recipient, Sent = sent };
-            ModelState.Clear();
-            return View(vm);
-        }
-
+        // --- OBSŁUGA OPINII ---
 
         [HttpGet, AllowAnonymous]
         public async Task<IActionResult> Opinions()
         {
+            // Pobieramy opinie, które w temacie mają frazę "Ocena:" lub są starymi opiniami
             var lastOpinions = await _ctx.Contacts
-                .Where(c => c.Subject == "Opinia o aplikacji")
+                .Where(c => c.Subject.StartsWith("Ocena:") || c.Subject == "Opinia o aplikacji")
                 .OrderByDescending(c => c.CreatedAt)
                 .Take(50)
                 .ToListAsync();
@@ -131,8 +59,9 @@ namespace MonitoringConfigurator.Controllers
         {
             if (!ModelState.IsValid)
             {
+                // Przeładowanie listy w przypadku błędu walidacji
                 model.ExistingOpinions = await _ctx.Contacts
-                    .Where(c => c.Subject == "Opinia o aplikacji")
+                    .Where(c => c.Subject.StartsWith("Ocena:") || c.Subject == "Opinia o aplikacji")
                     .OrderByDescending(c => c.CreatedAt)
                     .Take(50)
                     .ToListAsync();
@@ -145,7 +74,8 @@ namespace MonitoringConfigurator.Controllers
             var opinion = new Contact
             {
                 UserId = user?.Id,
-                Subject = "Opinia o aplikacji",
+                // Zapisujemy ocenę w temacie, np. "Ocena: 5"
+                Subject = $"Ocena: {model.Rating}",
                 Message = model.Message
             };
 
@@ -157,15 +87,14 @@ namespace MonitoringConfigurator.Controllers
             return RedirectToAction(nameof(Opinions));
         }
 
-        
-
         [Authorize(Roles = "Admin")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteOpinion(int id)
         {
+            // Pozwala adminowi usuwać opinie (zarówno stare jak i nowe z gwiazdkami)
             var opinion = await _ctx.Contacts
-                .Where(c => c.Subject == "Opinia o aplikacji" && c.Id == id)
+                .Where(c => (c.Subject == "Opinia o aplikacji" || c.Subject.StartsWith("Ocena:")) && c.Id == id)
                 .FirstOrDefaultAsync();
 
             if (opinion == null)
@@ -181,8 +110,70 @@ namespace MonitoringConfigurator.Controllers
             return RedirectToAction(nameof(Opinions));
         }
 
-[Authorize]
+        // --- POZOSTAŁE METODY (Wsparcie, Profil) ---
+
+        [Authorize]
+        [HttpGet]
+        public async Task<IActionResult> Support()
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null) return Challenge();
+
+            var sent = await _ctx.Contacts
+                .Where(c => c.UserId == user.Id)
+                .OrderByDescending(c => c.CreatedAt)
+                .Take(200)
+                .ToListAsync();
+
+            var vm = new SupportViewModel { Recipient = "Admin", Sent = sent };
+            return View(vm);
+        }
+
+        [Authorize]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Support(SupportViewModel model)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (!ModelState.IsValid)
+            {
+                if (user == null) return Challenge();
+                model.Sent = await _ctx.Contacts
+                    .Where(c => c.UserId == user.Id)
+                    .OrderByDescending(c => c.CreatedAt)
+                    .Take(200)
+                    .ToListAsync();
+                return View(model);
+            }
+
+            if (user == null) return Challenge();
+
+            var prefix = model.Recipient == "Operator" ? "[Operator] " : "[Admin] ";
+            var contact = new Contact
+            {
+                UserId = user.Id,
+                Subject = prefix + model.Subject,
+                Message = model.Message
+            };
+            _ctx.Contacts.Add(contact);
+            await _ctx.SaveChangesAsync();
+
+            ViewBag.Success = "Wiadomość została wysłana.";
+
+            var sent = await _ctx.Contacts
+                .Where(c => c.UserId == user.Id)
+                .OrderByDescending(c => c.CreatedAt)
+                .Take(200)
+                .ToListAsync();
+
+            var vm = new SupportViewModel { Recipient = model.Recipient, Sent = sent };
+            ModelState.Clear();
+            return View(vm);
+        }
+
+        [Authorize]
         [HttpGet]
         public IActionResult Profile() => View();
     }
 }
+

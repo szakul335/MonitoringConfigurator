@@ -1,7 +1,12 @@
-:root{
-  --brand-red:#e10600;
-  --brand-black:#0b0b0b;
-  --brand-gray:#1a1a1a;
+:root {
+    --brand-red: #e10600;
+    --brand-black: #0b0b0b;
+    --brand-gray: #1a1a1a;
+    --brand-dark: #151518;
+    --brand-border: #2b2b2b;
+    --text-main: #e5e7eb;
+    --text-muted: #9ca3af;
+    --gold: #fbbf24;
 }
 body{ background-color:#111; color:#eaeaea;}
 .navbar{ background-color:var(--brand-black) !important; }
@@ -467,4 +472,145 @@ footer.site-footer a:hover { text-decoration:underline; }
     width: 50px;
     height: 50px;
     background: rgba(255, 59, 48, 0
+}
+/* =========================================
+   8. OPINIE I OCENY (PREMIUM GOLD - FIXED)
+   ========================================= */
 
+/* Kontener gwiazdek w formularzu */
+.rating-group {
+    display: inline-flex;
+    flex-direction: row-reverse;
+    justify-content: center;
+    gap: 8px;
+}
+
+    .rating-group input {
+        position: absolute;
+        left: -9999px;
+    }
+
+    .rating-group label {
+        margin: 0;
+        cursor: pointer;
+        transition: transform 0.2s ease;
+    }
+
+        /* Wygląd gwiazdki w formularzu (Domyślny - szary) */
+        .rating-group label i {
+            font-size: 2.2rem;
+            color: #3f3f46; /* Ciemnoszary */
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            text-shadow: 0 2px 5px rgba(0,0,0,0.5);
+        }
+
+        /* Interakcja: Powiększanie */
+        .rating-group label:hover,
+        .rating-group input:checked + label {
+            transform: scale(1.2);
+        }
+
+    /* --- TU BYŁ BŁĄD: ZŁOTY KOLOR WPISANY NA SZTYWNO --- */
+    /* Gwiazdki przy najechaniu lub zaznaczeniu */
+    .rating-group:hover label i,
+    .rating-group input:checked ~ label i {
+        color: #fbbf24; /* Złoty zamiast var(--gold) */
+        text-shadow: 0 0 15px rgba(251, 191, 36, 0.6); /* Poświata */
+    }
+
+    /* Wygaszanie gwiazdek "starszych" (wizualnie po prawej) */
+    .rating-group label:hover ~ label i,
+    .rating-group input:checked + label:hover ~ label i {
+        color: #3f3f46;
+        text-shadow: none;
+    }
+
+/* Kafel opinii */
+.opinion-tile {
+    background: linear-gradient(145deg, #1a1a1e 0%, #151518 100%);
+    border: 1px solid #2d2d30;
+    border-radius: 16px;
+    padding: 1.5rem;
+    position: relative;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+    .opinion-tile:hover {
+        transform: translateY(-4px);
+        border-color: #fbbf24; /* Złota ramka */
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+    }
+
+/* Awatar z inicjałem */
+.opinion-avatar {
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%); /* Złoty gradient */
+    color: #fff;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 1.4rem;
+    margin-right: 1rem;
+    box-shadow: 0 4px 10px rgba(251, 191, 36, 0.3);
+}
+
+/* Gwiazdki na liście opinii */
+.stars-display {
+    color: #fbbf24; /* Złoty kolor */
+    font-size: 0.95rem;
+    letter-spacing: 2px;
+}
+
+    .stars-display .bi-star {
+        color: #3f3f46; /* Puste gwiazdki */
+    }
+
+/* Układ nagłówka opinii */
+.opinion-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+}
+
+.user-name {
+    color: #fff;
+    font-weight: 700;
+    font-size: 1rem;
+    display: block;
+}
+
+.user-role {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #a1a1aa;
+    background: #27272a;
+    padding: 2px 6px;
+    border-radius: 4px;
+    margin-left: 8px;
+    vertical-align: middle;
+}
+
+.opinion-date {
+    font-size: 0.8rem;
+    color: #71717a;
+    font-weight: 500;
+}
+
+.opinion-content {
+    color: #d4d4d8;
+    line-height: 1.6;
+    font-size: 0.95rem;
+}
+
+.quote-icon {
+    font-size: 1.5rem;
+    color: #2d2d30;
+    margin-right: 8px;
+    vertical-align: top;
+}
