@@ -52,8 +52,8 @@
                                 <tr>
                                     <th>Nazwa</th>
                                     <th>Kategoria</th>
-                                    <th>Cena</th>
-                                    <th style="width: 160px;"></th>
+                                    <th>Opis</th>
+                                    <th style="width: 220px;"></th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -62,16 +62,21 @@
                                     <tr>
                                         <td>
                                             <div class="fw-semibold">@item.Name</div>
-                                            <div class="text-muted small">@item.Brand @item.Model</div>
+                                            <div class="text-muted small">@($"{item.Brand} {item.Model}".Trim())</div>
                                         </td>
                                         <td>@item.Category</td>
-                                        <td>@item.Price.ToString("C")</td>
-                                        <td class="text-end">
-                                            <a class="btn btn-sm btn-outline-primary" asp-action="Manage" asp-route-id="@item.Id" asp-route-category="@Model.Category" asp-route-query="@Model.Query">Edytuj</a>
-                                            <form asp-action="Delete" method="post" asp-route-id="@item.Id" class="d-inline" onsubmit="return confirm('Czy na pewno chcesz usunąć ten produkt?');">
-                                                @Html.AntiForgeryToken()
-                                                <button type="submit" class="btn btn-sm btn-outline-danger">Usuń</button>
-                                            </form>
+                                        <td>
+                                            <span class="d-block text-muted small mb-2">
+                                                @(item.ShortDescription ?? item.Description ?? item.LongDescription ?? "Brak opisu")
+                                            </span>
+                                            <div class="d-flex flex-wrap justify-content-end gap-2">
+                                                <a class="btn btn-sm btn-outline-secondary" asp-action="Details" asp-route-id="@item.Id">Podgląd</a>
+                                                <a class="btn btn-sm btn-outline-primary" asp-action="Manage" asp-route-id="@item.Id" asp-route-category="@Model.Category" asp-route-query="@Model.Query">Edytuj</a>
+                                                <form asp-action="Delete" method="post" asp-route-id="@item.Id" class="d-inline" onsubmit="return confirm('Czy na pewno chcesz usunąć ten produkt?');">
+                                                    @Html.AntiForgeryToken()
+                                                    <button type="submit" class="btn btn-sm btn-outline-danger">Usuń</button>
+                                                </form>
+                                            </div>
                                         </td>
                                     </tr>
                                 }
