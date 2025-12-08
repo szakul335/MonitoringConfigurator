@@ -54,7 +54,7 @@
                                 <tr>
                                     <th>Nazwa</th>
                                     <th>Kategoria</th>
-                                    <th>Cena</th>
+
                                     <th style="width: 160px;"></th>
                                 </tr>
                             </thead>
@@ -67,7 +67,7 @@
                                             <div class="text-muted small">@item.Brand @item.Model</div>
                                         </td>
                                         <td>@item.Category</td>
-                                        <td>@item.Price.ToString("C")</td>
+
                                         <td class="text-end">
                                             <a class="btn btn-sm btn-outline-primary" asp-action="Manage" asp-route-id="@item.Id" asp-route-category="@Model.Category" asp-route-query="@Model.Query">Edytuj</a>
                                             <form asp-action="Delete" method="post" asp-route-id="@item.Id" class="d-inline" onsubmit="return confirm('Czy na pewno chcesz usunąć ten produkt?');">
