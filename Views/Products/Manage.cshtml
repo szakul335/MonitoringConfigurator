@@ -1,11 +1,6 @@
 @model MonitoringConfigurator.Models.ProductManagementViewModel
 @using MonitoringConfigurator.Models
 @using Microsoft.AspNetCore.Mvc.ViewFeatures
-@{ 
-    ViewData["Title"] = "Panel produktów";
-    var formViewData = new ViewDataDictionary<Product>(ViewData)
-    {
-        Model = Model.EditableProduct,
         TemplateInfo = new TemplateInfo { HtmlFieldPrefix = "EditableProduct" }
     };
 }
@@ -70,15 +65,7 @@
                                         <td>@item.Category</td>
                                         <td>@item.Price.ToString("C")</td>
                                         <td>
-                                            <a
-                                                class="btn btn-sm btn-outline-primary"
-                                                asp-action="Manage"
-                                                asp-route-id="@item.Id"
-                                                asp-route-category="@Model.Category"
-                                                asp-route-query="@Model.Query"
-                                                asp-fragment="productForm">
-                                                Edytuj
-                                            </a>
+
                                         </td>
                                     </tr>
                                 }
@@ -88,26 +75,7 @@
                 </div>
             </div>
         }
-    </div>
-    <div class="col-lg-4" id="productForm">
-        <div class="card shadow-sm">
-            <div class="card-body">
-                <h2 class="h5 mb-3">@(Model.IsEdit ? "Edytuj produkt" : "Dodaj produkt")</h2>
-                <form asp-action="Manage" method="post">
-                    @Html.AntiForgeryToken()
-                    <input type="hidden" asp-for="EditableProduct.Id" />
-                    <input type="hidden" asp-for="Category" />
-                    <input type="hidden" asp-for="Query" />
-                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
-                    <partial name="_Form" model="Model.EditableProduct" view-data="formViewData" />
-                    <div class="mt-4 d-flex gap-2">
-                        <button type="submit" class="btn btn-primary">Zapisz</button>
-                        <a asp-action="Manage" class="btn btn-outline-secondary">Wyczyść formularz</a>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
+
 </div>
 
 @section Scripts {
