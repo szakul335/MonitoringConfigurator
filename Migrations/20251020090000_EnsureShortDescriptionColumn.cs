@@ -29,6 +29,7 @@ namespace MonitoringConfigurator.Migrations
                     ALTER TABLE [Products] DROP COLUMN [Price];
                 END
             ");
+
         }
 
         /// <inheritdoc />
@@ -43,6 +44,7 @@ namespace MonitoringConfigurator.Migrations
                     ALTER TABLE [Products] DROP COLUMN [ShortDescription];
                 END
             ");
+
 
             migrationBuilder.Sql(@"
                 IF NOT EXISTS (

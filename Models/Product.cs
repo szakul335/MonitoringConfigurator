@@ -41,6 +41,16 @@ namespace MonitoringConfigurator.Models
         [Display(Name = "Kategoria")]
         public ProductCategory Category { get; set; }
 
+
+        [Display(Name = "Cena (PLN)")]
+        [DataType(DataType.Currency)]
+        [Range(0, double.MaxValue, ErrorMessage = "Cena musi być nieujemna.")]
+        public decimal Price { get; set; }
+
+        [StringLength(300)]
+        [Display(Name = "Krótki opis")]
+        public string? ShortDescription { get; set; }
+
         [StringLength(300)]
         [Display(Name = "Krótki opis")]
         public string? ShortDescription { get; set; }

@@ -353,6 +353,12 @@ namespace MonitoringConfigurator.Migrations
                     b.Property<int?>("PoeBudgetW")
                         .HasColumnType("int");
 
+
+                    b.Property<decimal>("Price")
+                        .HasColumnType("decimal(18,2)");
+
+
+
                     b.Property<int?>("Ports")
                         .HasColumnType("int");
 
