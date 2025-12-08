@@ -3,7 +3,7 @@
 @using Microsoft.AspNetCore.Mvc.ViewFeatures
 @{
     ViewData["Title"] = "Panel produktów";
-    var formViewData = new ViewDataDictionary<Product>(ViewData)
+    var formViewData = new ViewDataDictionary<Product>(ViewData, Model.EditableProduct)
     {
         TemplateInfo = new TemplateInfo { HtmlFieldPrefix = "EditableProduct" }
     };
