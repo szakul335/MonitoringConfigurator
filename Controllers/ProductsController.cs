@@ -42,7 +42,7 @@ namespace MonitoringConfigurator.Controllers
 
             var editableProduct = id.HasValue
                 ? await _context.Products.FindAsync(id.Value)
-                : new Product { Price = 0 };
+                : new Product();
 
             if (id.HasValue && editableProduct == null)
             {
@@ -98,13 +98,31 @@ namespace MonitoringConfigurator.Controllers
             }
 
             await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Manage), new { category = viewModel.Category, query = viewModel.Query });
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "Admin")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var product = await _context.Products.FindAsync(id);
+            if (product == null)
+            {
+                return NotFound();
+            }
+
+            _context.Products.Remove(product);
+            await _context.SaveChangesAsync();
+            TempData["Toast"] = "Produkt został usunięty.";
+
             return RedirectToAction(nameof(Manage));
         }
 
         [Authorize(Roles = "Admin")]
         public IActionResult Create()
         {
-            return View(new Product { Price = 0 });
+            return View(new Product());
         }
 
         [HttpPost]
