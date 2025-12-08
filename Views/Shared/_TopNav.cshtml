@@ -23,8 +23,7 @@
         <div class="collapse navbar-collapse" id="mainNav">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
 
-                @* USUNIĘTO: Linki do Konfiguratora i Produktów *@
-
+                <li class="nav-item"><a class="nav-link" asp-controller="Products" asp-action="Index">Produkty</a></li>
                 <li class="nav-item"><a class="nav-link" asp-controller="Info" asp-action="About">O nas</a></li>
                 <li class="nav-item"><a class="nav-link" asp-controller="Info" asp-action="Contact">Kontakt</a></li>
                 <li class="nav-item"><a class="nav-link" asp-controller="Info" asp-action="Faq">FAQ</a></li>
@@ -35,6 +34,7 @@
                 @* Admin-only *@
                 @if (isAdmin)
                 {
+                    <li class="nav-item"><a class="nav-link" asp-controller="Products" asp-action="Manage">Produkty (admin)</a></li>
                     <li class="nav-item"><a class="nav-link" asp-controller="Users" asp-action="Index">Użytkownicy</a></li>
                 }
 
