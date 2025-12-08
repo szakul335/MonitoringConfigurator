@@ -32,6 +32,20 @@ namespace MonitoringConfigurator.Controllers
             return View(vm);
         }
 
+        public async Task<IActionResult> Details(int id)
+        {
+            var product = await _context.Products
+                .AsNoTracking()
+                .FirstOrDefaultAsync(p => p.Id == id);
+
+            if (product == null)
+            {
+                return NotFound();
+            }
+
+            return View(product);
+        }
+
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Manage(int? id, ProductCategory? category, string? query)
         {
@@ -42,7 +56,7 @@ namespace MonitoringConfigurator.Controllers
 
             var editableProduct = id.HasValue
                 ? await _context.Products.FindAsync(id.Value)
-                : new Product { Price = 0 };
+                : new Product();
 
             if (id.HasValue && editableProduct == null)
             {
@@ -122,7 +136,7 @@ namespace MonitoringConfigurator.Controllers
         [Authorize(Roles = "Admin")]
         public IActionResult Create()
         {
-            return View(new Product { Price = 0 });
+            return View(new Product());
         }
 
         [HttpPost]
