@@ -6,7 +6,8 @@
 <h1 class="h3 mb-3">Edytuj produkt</h1>
 <div class="card shadow-sm">
     <div class="card-body">
-        <form method="post">
+        <form asp-action="Edit" method="post">
+            @Html.AntiForgeryToken()
             <input type="hidden" asp-for="Id" />
             <partial name="_Form" />
             <div class="mt-4 d-flex gap-2">

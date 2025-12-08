@@ -6,7 +6,8 @@
 <h1 class="h3 mb-3">Dodaj produkt</h1>
 <div class="card shadow-sm">
     <div class="card-body">
-        <form method="post">
+        <form asp-action="Create" method="post">
+            @Html.AntiForgeryToken()
             <partial name="_Form" />
             <div class="mt-4 d-flex gap-2">
                 <button type="submit" class="btn btn-primary">Zapisz</button>
