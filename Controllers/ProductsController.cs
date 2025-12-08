@@ -33,27 +33,78 @@ namespace MonitoringConfigurator.Controllers
         }
 
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> Manage(ProductCategory? category, string? query)
+        public async Task<IActionResult> Manage(int? id, ProductCategory? category, string? query)
         {
             var products = await BuildFilteredQuery(category, query)
                 .AsNoTracking()
                 .OrderBy(p => p.Name)
                 .ToListAsync();
 
-            var vm = new ProductCatalogViewModel
+            var editableProduct = id.HasValue
+                ? await _context.Products.FindAsync(id.Value)
+                : new Product { Price = 0 };
+
+            if (id.HasValue && editableProduct == null)
+            {
+                return NotFound();
+            }
+
+            var vm = new ProductManagementViewModel
             {
                 Category = category,
                 Query = query,
-                Products = products
+                Products = products,
+                EditableProduct = editableProduct
             };
 
             return View(vm);
         }
 
+        [HttpPost]
+        [Authorize(Roles = "Admin")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Manage(ProductManagementViewModel viewModel)
+        {
+            if (!ModelState.IsValid)
+            {
+                viewModel.Products = await BuildFilteredQuery(viewModel.Category, viewModel.Query)
+                    .AsNoTracking()
+                    .OrderBy(p => p.Name)
+                    .ToListAsync();
+
+                return View(viewModel);
+            }
+
+            var isEdit = viewModel.EditableProduct.Id != 0;
+
+            if (isEdit)
+            {
+                var exists = await _context.Products.AnyAsync(p => p.Id == viewModel.EditableProduct.Id);
+                if (!exists)
+                {
+                    return NotFound();
+                }
+            }
+
+            if (!isEdit)
+            {
+                _context.Products.Add(viewModel.EditableProduct);
+                TempData["Toast"] = "Produkt został dodany.";
+            }
+            else
+            {
+                _context.Entry(viewModel.EditableProduct).State = EntityState.Modified;
+                TempData["Toast"] = "Zmiany zapisane.";
+            }
+
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Manage));
+        }
+
         [Authorize(Roles = "Admin")]
         public IActionResult Create()
         {
-            return View(new Product { Stock = 1, Price = 0 });
+            return View(new Product { Price = 0 });
         }
 
         [HttpPost]
