@@ -60,19 +60,28 @@ namespace MonitoringConfigurator.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Support(SupportViewModel model)
         {
+            var user = await _userManager.GetUserAsync(User);
             if (!ModelState.IsValid)
             {
+                if (user == null)
+                {
+                    return Challenge();
+                }
+
                 // również załaduj historię wysłanych, żeby tabela się wyświetliła
-                var userForInvalid = await _userManager.GetUserAsync(User);
                 model.Sent = await _ctx.Contacts
-                    .Where(c => c.UserId == userForInvalid.Id)
+                    .Where(c => c.UserId == user.Id)
                     .OrderByDescending(c => c.CreatedAt)
                     .Take(200)
                     .ToListAsync();
                 return View(model);
             }
 
-            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+            {
+                return Challenge();
+            }
+
             var prefix = model.Recipient == "Operator" ? "[Operator] " : "[Admin] ";
             var contact = new Contact
             {
