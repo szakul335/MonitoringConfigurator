@@ -59,7 +59,7 @@
                             <tbody>
                                 @foreach (var item in Model.Products)
                                 {
-                                    <tr>
+                                 
                                         <td>
                                             <div class="fw-semibold">@item.Name</div>
                                             <div class="text-muted small">@($"{item.Brand} {item.Model}".Trim())</div>
@@ -74,8 +74,8 @@
                                                     <button type="submit" class="btn btn-sm btn-outline-danger">Usuń</button>
                                                 </form>
                                             </div>
-                                        </td>
-                                    </tr>
+                                        
+                                   
                                 }
                             </tbody>
                         </table>
