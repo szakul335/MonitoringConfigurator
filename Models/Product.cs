@@ -51,8 +51,12 @@ namespace MonitoringConfigurator.Models
         [Display(Name = "Krótki opis")]
         public string? ShortDescription { get; set; }
 
+
+        [StringLength(2000)]
+
         [StringLength(300)]
         [Display(Name = "Krótki opis")]
+
 
 
         public string? Description { get; set; }

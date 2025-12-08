@@ -25,11 +25,6 @@ namespace MonitoringConfigurator.Data
                 await ctx.Database.EnsureCreatedAsync();
             }
 
-
-            // Upewnij się, że kolumny ShortDescription i Price istnieją nawet, gdy migracje nie zostały zastosowane
-
-            // Upewnij się, że kolumna ShortDescription istnieje nawet, gdy migracja nie została zastosowana
-
             await ctx.Database.ExecuteSqlRawAsync(@"
                 IF NOT EXISTS (
                     SELECT 1 FROM sys.columns
@@ -42,11 +37,15 @@ namespace MonitoringConfigurator.Data
 
                 IF NOT EXISTS (
 
+
+                IF NOT EXISTS (
+
             ");
 
             // Usuń starą kolumnę Price, jeśli wciąż istnieje
             await ctx.Database.ExecuteSqlRawAsync(@"
                 IF EXISTS (
+
 
                     SELECT 1 FROM sys.columns
                     WHERE Name = 'Price' AND Object_ID = OBJECT_ID('Products')
@@ -56,7 +55,12 @@ namespace MonitoringConfigurator.Data
                     ALTER TABLE [Products] ADD [Price] DECIMAL(18, 2) NOT NULL CONSTRAINT DF_Products_Price DEFAULT 0;
                     ALTER TABLE [Products] DROP CONSTRAINT DF_Products_Price;
 
+
+                    ALTER TABLE [Products] ADD [Price] DECIMAL(18, 2) NOT NULL CONSTRAINT DF_Products_Price DEFAULT 0;
+                    ALTER TABLE [Products] DROP CONSTRAINT DF_Products_Price;
+
                     ALTER TABLE [Products] DROP COLUMN [Price];
+
 
                 END
             ");

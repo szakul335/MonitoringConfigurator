@@ -20,6 +20,8 @@ namespace MonitoringConfigurator.Migrations
                 END
             ");
 
+
+
             migrationBuilder.Sql(@"
                 IF EXISTS (
                     SELECT 1 FROM sys.columns
@@ -56,6 +58,7 @@ namespace MonitoringConfigurator.Migrations
                     ALTER TABLE [Products] DROP CONSTRAINT DF_Products_Price;
                 END
             ");
+
         }
     }
 }

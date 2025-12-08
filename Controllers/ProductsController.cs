@@ -189,6 +189,8 @@ namespace MonitoringConfigurator.Controllers
 
         private IQueryable<Product> BuildFilteredQuery(ProductCategory? category, string? query)
         {
+            EnsureProductColumns();
+
             var products = _context.Products.AsQueryable();
 
             if (category.HasValue)
@@ -205,6 +207,53 @@ namespace MonitoringConfigurator.Controllers
             }
 
             return products;
+        }
+
+        private static bool _productColumnsEnsured;
+        private static readonly object _ensureColumnsLock = new();
+
+        private void EnsureProductColumns()
+        {
+            if (_productColumnsEnsured)
+            {
+                return;
+            }
+
+            lock (_ensureColumnsLock)
+            {
+                if (_productColumnsEnsured)
+                {
+                    return;
+                }
+
+                try
+                {
+                    _context.Database.ExecuteSqlRaw(@"
+                        IF NOT EXISTS (
+                            SELECT 1 FROM sys.columns
+                            WHERE Name = 'ShortDescription' AND Object_ID = OBJECT_ID('Products')
+                        )
+                        BEGIN
+                            ALTER TABLE [Products] ADD [ShortDescription] NVARCHAR(300) NULL;
+                        END
+
+                        IF NOT EXISTS (
+                            SELECT 1 FROM sys.columns
+                            WHERE Name = 'Price' AND Object_ID = OBJECT_ID('Products')
+                        )
+                        BEGIN
+                            ALTER TABLE [Products] ADD [Price] DECIMAL(18, 2) NOT NULL CONSTRAINT DF_Products_Price DEFAULT 0;
+                            ALTER TABLE [Products] DROP CONSTRAINT DF_Products_Price;
+                        END
+                    ");
+                }
+                catch
+                {
+                    // If we cannot enforce the columns here, let the subsequent query surface the issue.
+                }
+
+                _productColumnsEnsured = true;
+            }
         }
     }
 }
