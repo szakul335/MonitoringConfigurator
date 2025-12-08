@@ -1,6 +1,10 @@
 @model MonitoringConfigurator.Models.ProductManagementViewModel
 @using MonitoringConfigurator.Models
 @using Microsoft.AspNetCore.Mvc.ViewFeatures
+@{
+    ViewData["Title"] = "Panel produktów";
+    var formViewData = new ViewDataDictionary(ViewData)
+    {
         TemplateInfo = new TemplateInfo { HtmlFieldPrefix = "EditableProduct" }
     };
 }
@@ -51,7 +55,7 @@
                                     <th>Nazwa</th>
                                     <th>Kategoria</th>
                                     <th>Cena</th>
-                                    <th style="width: 120px;"></th>
+                                    <th style="width: 160px;"></th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -64,8 +68,12 @@
                                         </td>
                                         <td>@item.Category</td>
                                         <td>@item.Price.ToString("C")</td>
-                                        <td>
-
+                                        <td class="text-end">
+                                            <a class="btn btn-sm btn-outline-primary" asp-action="Manage" asp-route-id="@item.Id" asp-route-category="@Model.Category" asp-route-query="@Model.Query">Edytuj</a>
+                                            <form asp-action="Delete" method="post" asp-route-id="@item.Id" class="d-inline" onsubmit="return confirm('Czy na pewno chcesz usunąć ten produkt?');">
+                                                @Html.AntiForgeryToken()
+                                                <button type="submit" class="btn btn-sm btn-outline-danger">Usuń</button>
+                                            </form>
                                         </td>
                                     </tr>
                                 }
@@ -76,6 +84,25 @@
             </div>
         }
 
+    </div>
+    <div class="col-lg-4">
+        <div class="card shadow-sm" id="productForm">
+            <div class="card-body">
+                <h5 class="card-title mb-3">@(Model.IsEdit ? "Edytuj produkt" : "Dodaj nowy produkt")</h5>
+                <form asp-action="Manage" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" asp-for="Category" />
+                    <input type="hidden" asp-for="Query" />
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <partial name="_Form" for="EditableProduct" view-data="formViewData" />
+                    <div class="mt-4 d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">@(Model.IsEdit ? "Zapisz zmiany" : "Dodaj produkt")</button>
+                        <a asp-action="Manage" asp-route-category="@Model.Category" asp-route-query="@Model.Query" class="btn btn-outline-secondary">Wyczyść</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 </div>
 
 @section Scripts {
