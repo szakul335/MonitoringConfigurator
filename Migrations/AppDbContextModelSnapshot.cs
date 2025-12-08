@@ -365,9 +365,6 @@ namespace MonitoringConfigurator.Migrations
                     b.Property<int?>("RollLengthM")
                         .HasColumnType("int");
 
-                    b.Property<int>("Stock")
-                        .HasColumnType("int");
-
                     b.Property<double?>("StorageTB")
                         .HasColumnType("float");
 

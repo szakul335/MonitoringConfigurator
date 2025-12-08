@@ -1,7 +1,12 @@
-@model MonitoringConfigurator.Models.ProductCatalogViewModel
+@model MonitoringConfigurator.Models.ProductManagementViewModel
 @using MonitoringConfigurator.Models
+@using Microsoft.AspNetCore.Mvc.ViewFeatures
 @{
     ViewData["Title"] = "Panel produktów";
+    var formViewData = new ViewDataDictionary<Product>(ViewData, Model.EditableProduct)
+    {
+        TemplateInfo = new TemplateInfo { HtmlFieldPrefix = "EditableProduct" }
+    };
 }
 
 <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-3">
@@ -9,12 +14,12 @@
         <h1 class="h3 mb-1">Panel produktów</h1>
         <p class="text-muted mb-0">Dodawaj, edytuj i filtruj produkty dostępne w katalogu.</p>
     </div>
-    <a class="btn btn-primary" asp-action="Create">Dodaj produkt</a>
+    <a class="btn btn-primary" href="#productForm">Dodaj produkt</a>
 </div>
 
 <div class="card shadow-sm mb-4">
     <div class="card-body">
-        <form method="get" class="row g-3 align-items-end">
+        <form asp-action="Manage" method="get" class="row g-3 align-items-end">
             <div class="col-md-4">
                 <label asp-for="Category" class="form-label"></label>
                 <select asp-for="Category" class="form-select" asp-items="Html.GetEnumSelectList<ProductCategory>()">
@@ -33,40 +38,77 @@
     </div>
 </div>
 
-@if (!Model.Products.Any())
-{
-    <div class="alert alert-info">Brak produktów w katalogu.</div>
-}
-else
-{
-    <div class="table-responsive">
-        <table class="table align-middle">
-            <thead>
-                <tr>
-                    <th>Nazwa</th>
-                    <th>Kategoria</th>
-                    <th>Cena</th>
-                    <th>Stan</th>
-                    <th style="width: 120px;"></th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var item in Model.Products)
-                {
-                    <tr>
-                        <td>
-                            <div class="fw-semibold">@item.Name</div>
-                            <div class="text-muted small">@item.Brand @item.Model</div>
-                        </td>
-                        <td>@item.Category</td>
-                        <td>@item.Price.ToString("C")</td>
-                        <td>@item.Stock szt.</td>
-                        <td>
-                            <a class="btn btn-sm btn-outline-primary" asp-action="Edit" asp-route-id="@item.Id">Edytuj</a>
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
+<div class="row g-4">
+    <div class="col-lg-8">
+        @if (!Model.Products.Any())
+        {
+            <div class="alert alert-info">Brak produktów w katalogu.</div>
+        }
+        else
+        {
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table align-middle">
+                            <thead>
+                                <tr>
+                                    <th>Nazwa</th>
+                                    <th>Kategoria</th>
+                                    <th>Cena</th>
+                                    <th style="width: 120px;"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model.Products)
+                                {
+                                    <tr>
+                                        <td>
+                                            <div class="fw-semibold">@item.Name</div>
+                                            <div class="text-muted small">@item.Brand @item.Model</div>
+                                        </td>
+                                        <td>@item.Category</td>
+                                        <td>@item.Price.ToString("C")</td>
+                                        <td>
+                                            <a
+                                                class="btn btn-sm btn-outline-primary"
+                                                asp-action="Manage"
+                                                asp-route-id="@item.Id"
+                                                asp-route-category="@Model.Category"
+                                                asp-route-query="@Model.Query"
+                                                asp-fragment="productForm">
+                                                Edytuj
+                                            </a>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        }
     </div>
+    <div class="col-lg-4" id="productForm">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h2 class="h5 mb-3">@(Model.IsEdit ? "Edytuj produkt" : "Dodaj produkt")</h2>
+                <form asp-action="Manage" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" asp-for="EditableProduct.Id" />
+                    <input type="hidden" asp-for="Category" />
+                    <input type="hidden" asp-for="Query" />
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                    <partial name="_Form" model="Model.EditableProduct" view-data="formViewData" />
+                    <div class="mt-4 d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">Zapisz</button>
+                        <a asp-action="Manage" class="btn btn-outline-secondary">Wyczyść formularz</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
 }
