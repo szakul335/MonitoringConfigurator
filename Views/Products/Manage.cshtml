@@ -1,10 +1,11 @@
 @model MonitoringConfigurator.Models.ProductManagementViewModel
 @using MonitoringConfigurator.Models
 @using Microsoft.AspNetCore.Mvc.ViewFeatures
-@{
+@{ 
     ViewData["Title"] = "Panel produktów";
-    var formViewData = new ViewDataDictionary<Product>(ViewData, Model.EditableProduct)
+    var formViewData = new ViewDataDictionary<Product>(ViewData)
     {
+        Model = Model.EditableProduct,
         TemplateInfo = new TemplateInfo { HtmlFieldPrefix = "EditableProduct" }
     };
 }
