@@ -1,90 +1,158 @@
 ﻿@model MonitoringConfigurator.Models.ConfigurationResult
 @{
-    ViewData["Title"] = "Twoja konfiguracja";
+    ViewData["Title"] = "Kosztorys";
     Layout = "~/Views/Shared/_Layout.cshtml";
-    // Serializacja wyniku do JSON, aby przekazać go do generatora PDF
     var jsonResult = System.Text.Json.JsonSerializer.Serialize(Model);
 }
 
 <div class="container py-5">
     <div class="d-flex align-items-center justify-content-between mb-4">
-        <h1 class="h2 text-white">Propozycja zestawu</h1>
-        <a asp-action="Index" class="btn btn-outline-secondary">Zmień parametry</a>
+        <h1 class="h2 text-white fw-bold">Twój Kosztorys</h1>
+        <a asp-action="Index" class="btn btn-outline-secondary"><i class="bi bi-pencil"></i> Edytuj</a>
     </div>
 
     <div class="row g-4">
         <div class="col-lg-8">
-            <div class="card card-dark mb-4">
-                <div class="card-header bg-transparent border-secondary py-3">
-                    <h5 class="mb-0 text-warning"><i class="bi bi-box-seam me-2"></i> Wybrane urządzenia</h5>
-                </div>
+            <div class="card card-dark shadow-sm border-secondary">
                 <div class="table-responsive">
                     <table class="table table-dark-custom align-middle mb-0">
-                        <thead>
+                        <thead class="bg-black bg-opacity-25">
                             <tr>
-                                <th class="ps-4">Produkt</th>
-                                <th class="text-center">Ilość</th>
-                                <th class="text-end pe-4">Cena jedn.</th>
-                                <th class="text-end pe-4">Wartość</th>
+                                <th class="ps-4 py-3">Produkt / Usługa</th>
+                                <th class="text-center py-3">Ilość</th>
+                                <th class="text-end pe-4 py-3">Wartość brutto</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @if (Model.SelectedCamera != null)
+                            <tr><td colspan="3" class="bg-secondary bg-opacity-10 text-uppercase small fw-bold ps-4 py-2 text-warning">Urządzenia</td></tr>
+
+                            @if (Model.SelectedOutdoorCam != null)
                             {
                                 <tr>
                                     <td class="ps-4">
-                                        <div class="fw-bold text-white">@Model.SelectedCamera.Name</div>
-                                        <small class="text-muted">Kamera: @Model.SelectedCamera.ResolutionMp MPix</small>
+                                        <div class="fw-bold text-white">@Model.SelectedOutdoorCam.Name</div>
+                                        <div class="small text-muted">Kamera zewnętrzna @Model.SelectedOutdoorCam.ResolutionMp MPix</div>
                                     </td>
-                                    <td class="text-center"><span class="badge bg-secondary">@Model.CameraQuantity szt.</span></td>
-                                    <td class="text-end">@Model.SelectedCamera.Price.ToString("N2")</td>
-                                    <td class="text-end pe-4 fw-bold">@((Model.SelectedCamera.Price * Model.CameraQuantity).ToString("N2")) zł</td>
+                                    <td class="text-center">@Model.Input.OutdoorCamCount</td>
+                                    <td class="text-end pe-4 fw-bold">@((Model.SelectedOutdoorCam.Price * Model.Input.OutdoorCamCount).ToString("N2")) zł</td>
                                 </tr>
                             }
-
+                            @if (Model.SelectedIndoorCam != null)
+                            {
+                                <tr>
+                                    <td class="ps-4">
+                                        <div class="fw-bold text-white">@Model.SelectedIndoorCam.Name</div>
+                                        <div class="small text-muted">Kamera wewnętrzna @Model.SelectedIndoorCam.ResolutionMp MPix</div>
+                                    </td>
+                                    <td class="text-center">@Model.Input.IndoorCamCount</td>
+                                    <td class="text-end pe-4 fw-bold">@((Model.SelectedIndoorCam.Price * Model.Input.IndoorCamCount).ToString("N2")) zł</td>
+                                </tr>
+                            }
                             @if (Model.SelectedNvr != null)
                             {
                                 <tr>
-                                    <td class="ps-4">
-                                        <div class="fw-bold text-white">@Model.SelectedNvr.Name</div>
-                                        <small class="text-muted">Rejestrator: @Model.SelectedNvr.Channels kanałów</small>
-                                    </td>
-                                    <td class="text-center"><span class="badge bg-secondary">1 szt.</span></td>
-                                    <td class="text-end">@Model.SelectedNvr.Price.ToString("N2")</td>
+                                    <td class="ps-4 text-white">@Model.SelectedNvr.Name <div class="small text-muted">Rejestrator</div></td>
+                                    <td class="text-center">@Model.NvrQuantity</td>
                                     <td class="text-end pe-4 fw-bold">@Model.SelectedNvr.Price.ToString("N2") zł</td>
                                 </tr>
                             }
+                            @if (Model.SelectedDisk != null)
+                            {
+                                <tr>
+                                    <td class="ps-4 text-white">@Model.SelectedDisk.Name <div class="small text-muted">Dysk @Model.SelectedDisk.StorageTB TB</div></td>
+                                    <td class="text-center">@Model.DiskQuantity</td>
+                                    <td class="text-end pe-4 fw-bold">@((Model.SelectedDisk.Price * Model.DiskQuantity).ToString("N2")) zł</td>
+                                </tr>
+                            }
+
+                            <tr><td colspan="3" class="bg-secondary bg-opacity-10 text-uppercase small fw-bold ps-4 py-2 text-warning">Zasilanie i UPS</td></tr>
 
                             @if (Model.SelectedSwitch != null)
                             {
                                 <tr>
-                                    <td class="ps-4">
-                                        <div class="fw-bold text-white">@Model.SelectedSwitch.Name</div>
-                                        <small class="text-muted">Switch PoE: @Model.SelectedSwitch.Ports portów</small>
-                                    </td>
-                                    <td class="text-center"><span class="badge bg-secondary">@Model.SwitchQuantity szt.</span></td>
-                                    <td class="text-end">@Model.SelectedSwitch.Price.ToString("N2")</td>
-                                    <td class="text-end pe-4 fw-bold">@((Model.SelectedSwitch.Price * Model.SwitchQuantity).ToString("N2")) zł</td>
+                                    <td class="ps-4 text-white">@Model.SelectedSwitch.Name <div class="small text-muted">Switch PoE</div></td>
+                                    <td class="text-center">@Model.SwitchQuantity</td>
+                                    <td class="text-end pe-4 fw-bold">@Model.SelectedSwitch.Price.ToString("N2") zł</td>
+                                </tr>
+                            }
+                            @if (Model.Input.NeedUps)
+                            {
+                                @if (Model.SelectedUps != null)
+                                {
+                                    <tr>
+                                        <td class="ps-4 text-white">@Model.SelectedUps.Name <div class="small text-muted">UPS (Podtrzymanie > @Model.Input.UpsRuntimeMinutes min)</div></td>
+                                        <td class="text-center">@Model.UpsQuantity</td>
+                                        <td class="text-end pe-4 fw-bold">@Model.SelectedUps.Price.ToString("N2") zł</td>
+                                    </tr>
+                                }
+                                else
+                                {
+                                    <tr>
+                                        <td class="ps-4 text-danger fw-bold"><i class="bi bi-exclamation-triangle"></i> Brak odpowiedniego UPS w ofercie</td>
+                                        <td class="text-center">-</td>
+                                        <td class="text-end pe-4">-</td>
+                                    </tr>
+                                }
+                            }
+
+                            <tr><td colspan="3" class="bg-secondary bg-opacity-10 text-uppercase small fw-bold ps-4 py-2 text-warning">Akcesoria Montażowe</td></tr>
+
+                            @if (Model.SelectedCable != null)
+                            {
+                                <tr>
+                                    <td class="ps-4 text-white">@Model.SelectedCable.Name <div class="small text-muted">Kabel (szac. @Model.EstimatedCableMeters m)</div></td>
+                                    <td class="text-center">@Model.CableQuantity <small class="text-muted">rol.</small></td>
+                                    <td class="text-end pe-4 fw-bold">@((Model.SelectedCable.Price * Model.CableQuantity).ToString("N2")) zł</td>
+                                </tr>
+                            }
+                            else if (Model.Input.NeedCabling)
+                            {
+                                <tr><td class="ps-4 text-danger">Brak kabla w ofercie</td><td>-</td><td>-</td></tr>
+                            }
+
+                            @if (Model.Input.InstallType == InstallationType.Surface)
+                            {
+                                @if (Model.SelectedTray != null)
+                                {
+                                    <tr>
+                                        <td class="ps-4 text-white">@Model.SelectedTray.Name <div class="small text-muted">Korytka kablowe</div></td>
+                                        <td class="text-center">@Model.TrayMeters <small class="text-muted">m</small></td>
+                                        <td class="text-end pe-4 fw-bold">@((Model.SelectedTray.Price * Model.TrayMeters).ToString("N2")) zł</td>
+                                    </tr>
+                                }
+                                else
+                                {
+                                    <tr><td class="ps-4 text-secondary fst-italic">Brak korytek w ofercie</td><td>-</td><td>-</td></tr>
+                                }
+                            }
+
+                            @if (Model.SelectedScrews != null)
+                            {
+                                <tr>
+                                    <td class="ps-4 text-white">@Model.SelectedScrews.Name</td>
+                                    <td class="text-center">@Model.ScrewsQuantity <small class="text-muted">kpl.</small></td>
+                                    <td class="text-end pe-4 fw-bold">@((Model.SelectedScrews.Price * Model.ScrewsQuantity).ToString("N2")) zł</td>
                                 </tr>
                             }
 
-                            @if (Model.SelectedDisk != null)
+                            @if (Model.AssemblyCost > 0)
                             {
+                                <tr><td colspan="3" class="bg-secondary bg-opacity-10 text-uppercase small fw-bold ps-4 py-2 text-warning">Usługi</td></tr>
                                 <tr>
-                                    <td class="ps-4">
-                                        <div class="fw-bold text-white">@Model.SelectedDisk.Name</div>
-                                        <small class="text-muted">Dysk twardy: @Model.SelectedDisk.StorageTB TB</small>
+                                    <td class="ps-4 text-white">
+                                        Profesjonalny montaż i konfiguracja
+                                        <div class="small text-muted">Instalacja @Model.Input.InstallType, konfiguracja zdalna</div>
                                     </td>
-                                    <td class="text-center"><span class="badge bg-secondary">@Model.DiskQuantity szt.</span></td>
-                                    <td class="text-end">@Model.SelectedDisk.Price.ToString("N2")</td>
-                                    <td class="text-end pe-4 fw-bold">@((Model.SelectedDisk.Price * Model.DiskQuantity).ToString("N2")) zł</td>
+                                    <td class="text-center">1</td>
+                                    <td class="text-end pe-4 fw-bold">@Model.AssemblyCost.ToString("N2") zł</td>
                                 </tr>
                             }
+
                         </tbody>
-                        <tfoot style="border-top: 2px solid #444;">
+                        <tfoot class="border-top border-secondary bg-black">
                             <tr>
-                                <td colspan="3" class="text-end pt-3">RAZEM (brutto):</td>
-                                <td class="text-end pe-4 pt-3 text-danger fs-4 fw-bold">@Model.TotalPrice.ToString("N2") zł</td>
+                                <td colspan="2" class="text-end pe-3 py-4 text-uppercase text-muted">Suma całkowita:</td>
+                                <td class="text-end pe-4 py-4 text-danger fs-2 fw-bold">@Model.TotalPrice.ToString("N2") zł</td>
                             </tr>
                         </tfoot>
                     </table>
@@ -93,38 +161,32 @@
         </div>
 
         <div class="col-lg-4">
-            <div class="card card-dark mb-4">
+            <div class="card card-dark shadow-sm border-secondary mb-3">
                 <div class="card-body">
-                    <h5 class="text-white mb-3">Analiza techniczna</h5>
+                    <h5 class="text-white mb-3">Podsumowanie techniczne</h5>
                     <ul class="list-unstyled text-muted small mb-0">
-                        <li class="mb-2 d-flex justify-content-between">
-                            <span>Przepustowość:</span>
-                            <span class="text-white">@Model.EstimatedBandwidthMbps Mbps</span>
-                        </li>
-                        <li class="mb-2 d-flex justify-content-between">
-                            <span>Wymagany dysk:</span>
-                            <span class="text-white">@Model.EstimatedStorageTB TB</span>
-                        </li>
-                        <li class="mb-2 d-flex justify-content-between">
-                            <span>Moc PoE:</span>
-                            <span class="text-white">@Model.EstimatedPoEBudgetW W</span>
-                        </li>
+                        <li class="mb-2">Typ instalacji: <span class="text-white">@Model.Input.InstallType</span></li>
+                        <li class="mb-2">Szac. długość kabli: <span class="text-white">@Model.EstimatedCableMeters m</span></li>
+                        <li class="mb-2">Zapotrzebowanie HDD: <span class="text-white">@Model.EstimatedStorageTB TB</span></li>
+                        <li class="mb-2">Pobór mocy (PoE): <span class="text-white">@Model.EstimatedPoEBudgetW W</span></li>
+                        @if (Model.SelectedUps != null)
+                        {
+                            <li class="mb-2 text-success"><i class="bi bi-battery-charging"></i> UPS zabezpiecza system</li>
+                        }
                     </ul>
                 </div>
             </div>
 
-            <div class="card card-dark border-danger border-opacity-25">
-                <div class="card-body text-center">
-                    <i class="bi bi-file-earmark-pdf text-danger display-4 mb-3"></i>
-                    <h5 class="text-white">Pobierz wycenę</h5>
-                    <p class="text-muted small">Wygeneruj oficjalny dokument PDF z tym zestawieniem.</p>
-
+            <div class="card bg-danger bg-gradient border-0 shadow text-center">
+                <div class="card-body py-4">
+                    <h4 class="text-white mb-3">Zapisz ofertę</h4>
                     <form asp-action="GeneratePdf" method="post">
                         <input type="hidden" name="jsonResult" value="@jsonResult" />
-                        <button type="submit" class="btn btn-danger w-100">
-                            Pobierz PDF
+                        <button type="submit" class="btn btn-light w-100 fw-bold text-danger shadow-sm mb-2">
+                            <i class="bi bi-file-pdf-fill me-2"></i> Pobierz PDF
                         </button>
                     </form>
+                    <a href="/Info/Contact" class="btn btn-outline-light w-100 btn-sm mt-2">Zamów konsultację</a>
                 </div>
             </div>
         </div>
