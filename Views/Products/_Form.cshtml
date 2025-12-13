@@ -1,6 +1,8 @@
 @model MonitoringConfigurator.Models.Product
 @using MonitoringConfigurator.Models
 
+<input type="hidden" asp-for="Id" />
+
 <div class="row g-2">
     <div class="col-12">
         <label asp-for="Name" class="form-label text-muted small">Nazwa produktu</label>
@@ -59,6 +61,7 @@
 
         <input type="hidden" asp-for="ImageUrl" />
     </div>
+
     <div class="col-12 mt-3 pb-1 border-bottom border-secondary">
         <span class="badge bg-secondary text-dark">Parametry wideo</span>
     </div>
