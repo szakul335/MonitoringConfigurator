@@ -1,0 +1,73 @@
+﻿@model MonitoringConfigurator.Models.ConfiguratorInputModel
+@{
+    ViewData["Title"] = "Konfigurator CCTV";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container py-5">
+    <div class="text-center mb-5">
+        <h1 class="display-4 fw-bold text-white">Stwórz swój system</h1>
+        <p class="text-muted lead">Odpowiedz na kilka pytań, a my dobierzemy sprzęt z naszej bazy.</p>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card card-dark shadow-lg">
+                <div class="card-body p-4 p-md-5">
+                    <form asp-action="Calculate" method="post">
+                        @Html.ValidationSummary(true, "", new { @class = "text-danger mb-3" })
+
+                        <div class="row g-4">
+                            <div class="col-md-6">
+                                <label asp-for="CameraCount" class="form-label text-warning fw-bold">1. Ile kamer potrzebujesz?</label>
+                                <input asp-for="CameraCount" class="form-control form-control-lg form-control-dark" type="number" min="1" max="128" />
+                                <span asp-validation-for="CameraCount" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="ResolutionMp" class="form-label text-warning fw-bold">2. Jaka jakość obrazu?</label>
+                                <select asp-for="ResolutionMp" class="form-select form-select-lg form-select-dark">
+                                    <option value="2">2 Mpix (Full HD) - Podstawowa</option>
+                                    <option value="4">4 Mpix (2K) - Zalecana</option>
+                                    <option value="8">8 Mpix (4K) - Najwyższa</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="RecordingDays" class="form-label text-warning fw-bold">3. Ile dni archiwizacji?</label>
+                                <div class="input-group">
+                                    <input asp-for="RecordingDays" class="form-control form-control-lg form-control-dark" type="number" />
+                                    <span class="input-group-text bg-dark border-secondary text-white">dni</span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="RecordingMode" class="form-label text-warning fw-bold">4. Tryb nagrywania</label>
+                                <select asp-for="RecordingMode" class="form-select form-select-lg form-select-dark">
+                                    <option value="motion">Tylko z detekcji ruchu (Oszczędność dysku)</option>
+                                    <option value="continuous">Ciągłe 24/7 (Wymaga dużych dysków)</option>
+                                </select>
+                            </div>
+
+                            <div class="col-12">
+                                <div class="form-check form-switch p-3 border border-secondary rounded bg-black bg-opacity-25">
+                                    <input asp-for="NeedPoE" class="form-check-input" type="checkbox" style="width: 3em; height: 1.5em; margin-right: 1em;">
+                                    <label class="form-check-label pt-1" asp-for="NeedPoE">
+                                        <strong>Zasilanie PoE (Power over Ethernet)</strong><br />
+                                        <small class="text-muted">Kamery zasilane jednym kablem bezpośrednio ze switcha. Zalecane.</small>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2 mt-5">
+                            <button type="submit" class="btn btn-danger btn-lg py-3 fw-bold text-uppercase shadow-sm">
+                                <i class="bi bi-magic me-2"></i> Dobierz sprzęt
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
