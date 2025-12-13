@@ -1,165 +1,234 @@
 @page
 @model MonitoringConfigurator.Areas.Identity.Pages.Account.Manage.IndexModel
 @{
-    ViewData["Title"] = "Moje konto";
+    ViewData["Title"] = "Ustawienia konta";
     ViewData["ActivePage"] = MonitoringConfigurator.Areas.Identity.Pages.Account.Manage.ManageNavPages.Index;
     Layout = "/Views/Shared/_Layout.cshtml";
 }
+
 <style>
-  body{background:#0f0f10;color:#e5e7eb}
-  .card{background:#151518;border:1px solid #2b2b2b;border-radius:.6rem}
-  .form-control,.form-select{background:#121214;border-color:#2a2a2a;color:#e5e7eb}
-  .btn-danger{background:#ff3b30;border-color:#ff3b30}
-  .muted{color:#9ca3af}
-  .kv{display:flex;justify-content:space-between;gap:12px;padding:.35rem 0;border-bottom:1px dashed #2b2b2b}
-  .kv:last-child{border-bottom:none}
-  .avatar{width:68px;height:68px;border-radius:50%;display:flex;align-items:center;justify-content:center;
-          background:linear-gradient(135deg,#ff3b30,#ff6b61);font-weight:800;font-size:1.2rem;color:white}
+    body {
+        background-color: #0f0f10;
+        color: #e5e7eb;
+    }
+
+    .card-profile {
+        background: #151518;
+        border: 1px solid #2b2b2b;
+        border-radius: 1rem;
+        overflow: hidden;
+    }
+
+    .card-header-profile {
+        background: linear-gradient(90deg, #1f1f22 0%, #151518 100%);
+        padding: 1.5rem;
+        border-bottom: 1px solid #2b2b2b;
+    }
+
+    .form-control, .form-select {
+        background: #0b0b0b;
+        border-color: #2b2b2b;
+        color: #fff;
+    }
+
+        .form-control:focus, .form-select:focus {
+            background: #000;
+            border-color: #ff3b30;
+            box-shadow: 0 0 0 0.25rem rgba(255, 59, 48, 0.2);
+            color: #fff;
+        }
+
+    .avatar-xl {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 4px solid #151518;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+    }
+
+    .avatar-placeholder {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #ff3b30, #ff6b61);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: white;
+        border: 4px solid #151518;
+    }
+
+    .btn-danger {
+        background-color: #ff3b30;
+        border-color: #ff3b30;
+    }
+
+        .btn-danger:hover {
+            background-color: #d63026;
+            border-color: #d63026;
+        }
+
+    .nav-pills .nav-link.active {
+        background-color: #ff3b30;
+    }
 </style>
 
-<div class="container py-4">
-  <h1 class="mb-1">Moje konto</h1>
-  <div class="text-muted mb-3">Zarządzaj ustawieniami swojego konta.</div>
+<div class="container py-5">
+    <div class="row g-4">
+        <div class="col-lg-3">
+            <partial name="_ManageNav" />
+        </div>
 
-  <div class="row g-3">
-    <div class="col-md-3">
-      <partial name="_ManageNav"/>
+        <div class="col-lg-9">
+            <partial name="_StatusMessage" for="StatusMessage" />
+
+            <div class="card card-profile mb-4">
+                <div class="card-header-profile d-flex align-items-center gap-4 flex-wrap">
+                    <div class="position-relative">
+                        @if (!string.IsNullOrWhiteSpace(Model.AvatarUrl))
+                        {
+                            <img src="@Model.AvatarUrl" alt="Avatar" class="avatar-xl">
+                        }
+                        else
+                        {
+                            <div class="avatar-placeholder">@Model.Initials</div>
+                        }
+
+                    </div>
+                    <div>
+                        <h2 class="h4 mb-1 text-white">@Model.Username</h2>
+                        <p class="text-muted mb-0 small">@Model.Email • ID: <span class="font-monospace text-secondary">@Model.UserId</span></p>
+                    </div>
+
+                    <div class="ms-auto">
+                        <button class="btn btn-outline-secondary btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#avatarCollapse">
+                            <i class="bi bi-camera"></i> Zmień zdjęcie
+                        </button>
+                    </div>
+                </div>
+
+                <div class="collapse bg-dark" id="avatarCollapse">
+                    <div class="p-3 border-bottom border-secondary border-opacity-25">
+                        <form method="post" asp-page-handler="UploadAvatar" enctype="multipart/form-data" class="d-flex align-items-center gap-2">
+                            <input class="form-control form-control-sm" type="file" name="avatar" accept="image/*" />
+                            <button class="btn btn-light btn-sm">Wyślij</button>
+                        </form>
+                        <small class="text-muted">Format: JPG/PNG, maks. 2MB.</small>
+                    </div>
+                </div>
+
+                <div class="card-body p-4">
+                    <form method="post" asp-page-handler="SaveProfile">
+                        <h5 class="mb-3 text-secondary text-uppercase small fw-bold">Dane osobowe</h5>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label asp-for="Input.FullName" class="form-label text-muted">Imię i nazwisko</label>
+                                <input asp-for="Input.FullName" class="form-control" placeholder="np. Jan Kowalski" />
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="Input.Company" class="form-label text-muted">Firma</label>
+                                <input asp-for="Input.Company" class="form-control" placeholder="Opcjonalne" />
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="Input.PhoneNumber" class="form-label text-muted">Telefon</label>
+                                <input asp-for="Input.PhoneNumber" class="form-control" />
+                                <span asp-validation-for="Input.PhoneNumber" class="text-danger small"></span>
+                            </div>
+                        </div>
+
+                        <div class="mt-4 pt-3 border-top border-secondary border-opacity-25 text-end">
+                            <button type="submit" class="btn btn-danger">Zapisz zmiany</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="row g-4">
+                <div class="col-md-12">
+                    <div class="card card-profile h-100">
+                        <div class="card-body p-4">
+                            <h5 class="mb-3 text-secondary text-uppercase small fw-bold">Adres korespondencyjny</h5>
+                            <form method="post" asp-page-handler="SaveAddress">
+                                <div class="row g-3">
+                                    <div class="col-md-8">
+                                        <label class="form-label text-muted small">Ulica i nr</label>
+                                        <input asp-for="Address.Street" class="form-control" />
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label text-muted small">Kod pocztowy</label>
+                                        <input asp-for="Address.PostalCode" class="form-control" />
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label text-muted small">Miasto</label>
+                                        <input asp-for="Address.City" class="form-control" />
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label text-muted small">Kraj</label>
+                                        <input asp-for="Address.Country" class="form-control" />
+                                    </div>
+                                </div>
+                                <div class="mt-3 text-end">
+                                    <button class="btn btn-outline-light btn-sm">Aktualizuj adres</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="card card-profile h-100">
+                        <div class="card-body p-4">
+                            <h5 class="mb-3 text-secondary text-uppercase small fw-bold">Ustawienia aplikacji</h5>
+                            <form method="post" asp-page-handler="SavePrefs">
+                                <div class="mb-2">
+                                    <label class="form-label text-muted small">Język interfejsu</label>
+                                    <select asp-for="Prefs.Language" class="form-select">
+                                        <option value="pl">Polski</option>
+                                        <option value="en">English</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label text-muted small">Motyw</label>
+                                    <select asp-for="Prefs.Theme" class="form-select">
+                                        <option value="dark">Ciemny (Domyślny)</option>
+                                        <option value="light">Jasny</option>
+                                    </select>
+                                </div>
+                                <div class="form-check form-switch mb-3">
+                                    <input asp-for="Prefs.Newsletter" class="form-check-input" type="checkbox" role="switch">
+                                    <label class="form-check-label" for="Prefs.Newsletter">Newsletter e-mail</label>
+                                </div>
+                                <button class="btn btn-outline-light btn-sm w-100">Zapisz ustawienia</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="card card-profile h-100 border-danger border-opacity-25">
+                        <div class="card-body p-4">
+                            <h5 class="mb-3 text-danger text-uppercase small fw-bold">Strefa niebezpieczna</h5>
+                            <p class="small text-muted">Pobierz kopię swoich danych lub trwale usuń konto z serwisu.</p>
+
+                            <form method="post" asp-page-handler="ExportData" class="mb-3">
+                                <button class="btn btn-outline-secondary btn-sm w-100"><i class="bi bi-download"></i> Pobierz dane (JSON)</button>
+                            </form>
+
+                            <form method="post" asp-page-handler="DeleteAccount">
+                                <div class="input-group input-group-sm">
+                                    <input asp-for="Delete.Confirm" class="form-control border-danger text-danger" placeholder="Wpisz: USUŃ" />
+                                    <button class="btn btn-danger">Usuń konto</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-
-    <div class="col-md-9">
-      <partial name="_StatusMessage" for="StatusMessage"/>
-
-      <!-- Sekcja: profil -->
-      <div class="card p-3 mb-3">
-        <div class="d-flex gap-3 align-items-center mb-2">
-          <div class="avatar">@Model.Initials</div>
-          <div>
-            <div class="fw-semibold">@Model.Username</div>
-            <div class="muted">ID użytkownika: @Model.UserId</div>
-          </div>
-        </div>
-
-        <form method="post" asp-page-handler="SaveProfile">
-          <div class="row g-2">
-            <div class="col-md-6">
-              <label class="form-label">Imię i nazwisko</label>
-              <input asp-for="Input.FullName" class="form-control" placeholder="np. Jan Kowalski"/>
-            </div>
-            <div class="col-md-6">
-              <label class="form-label">Firma (opcjonalnie)</label>
-              <input asp-for="Input.Company" class="form-control" placeholder="np. Konfigurator CCTV"/>
-            </div>
-            <div class="col-md-6">
-              <label class="form-label">Numer telefonu</label>
-              <input asp-for="Input.PhoneNumber" class="form-control"/>
-              <span asp-validation-for="Input.PhoneNumber" class="text-danger"></span>
-            </div>
-          </div>
-          <button class="btn btn-danger mt-3">Zapisz</button>
-        </form>
-      </div>
-
-      <!-- Sekcja: preferencje -->
-      <div class="card p-3 mb-3">
-        <h5 class="mb-2">Preferencje</h5>
-        <form method="post" asp-page-handler="SavePrefs">
-          <div class="row g-2">
-            <div class="col-md-4">
-              <label class="form-label">Język</label>
-              <select asp-for="Prefs.Language" class="form-select">
-                <option value="pl">Polski</option>
-                <option value="en">English</option>
-              </select>
-            </div>
-            <div class="col-md-4">
-              <label class="form-label">Motyw</label>
-              <select asp-for="Prefs.Theme" class="form-select">
-                <option value="dark">Ciemny</option>
-                <option value="light">Jasny</option>
-              </select>
-            </div>
-            <div class="col-md-4 d-flex align-items-end">
-              <div class="form-check">
-                <input asp-for="Prefs.Newsletter" class="form-check-input" type="checkbox" id="nl">
-                <label class="form-check-label" for="nl">Otrzymuj powiadomienia e-mail</label>
-              </div>
-            </div>
-          </div>
-          <button class="btn btn-danger mt-3">Zapisz preferencje</button>
-        </form>
-      </div>
-
-      <!-- Sekcja: avatar -->
-      <div class="card p-3 mb-3">
-        <h5 class="mb-2">Avatar</h5>
-        <div class="d-flex align-items-center gap-3 mb-2">
-          <img src="@(string.IsNullOrWhiteSpace(Model.AvatarUrl) ? "/img/avatar-placeholder.png" : Model.AvatarUrl)" alt="avatar" style="width:64px;height:64px;border-radius:50%;object-fit:cover;border:1px solid #2b2b2b;">
-          <form method="post" asp-page-handler="UploadAvatar" enctype="multipart/form-data">
-            <input class="form-control form-control-sm" type="file" name="avatar" accept="image/*" />
-            <button class="btn btn-danger btn-sm mt-2">Wyślij</button>
-          </form>
-        </div>
-        <div class="text-muted small">Akceptowane: JPG/PNG, do 2&nbsp;MB.</div>
-      </div>
-
-      <!-- Sekcja: adres korespondencyjny -->
-      <div class="card p-3 mb-3">
-        <h5 class="mb-2">Adres korespondencyjny</h5>
-        <form method="post" asp-page-handler="SaveAddress">
-          <div class="row g-2">
-            <div class="col-md-6">
-              <label class="form-label">Ulica i nr</label>
-              <input asp-for="Address.Street" class="form-control" placeholder="np. Gorzechowo 1" />
-            </div>
-            <div class="col-md-3">
-              <label class="form-label">Kod pocztowy</label>
-              <input asp-for="Address.PostalCode" class="form-control" placeholder="00-000" />
-            </div>
-            <div class="col-md-3">
-              <label class="form-label">Miasto</label>
-              <input asp-for="Address.City" class="form-control" placeholder="np. Gorzechowo" />
-            </div>
-            <div class="col-md-4">
-              <label class="form-label">Kraj</label>
-              <input asp-for="Address.Country" class="form-control" placeholder="np. Polska" />
-            </div>
-          </div>
-          <button class="btn btn-danger mt-3">Zapisz adres</button>
-        </form>
-      </div>
-
-      <!-- Sekcja: eksport danych -->
-      <div class="card p-3 mb-3">
-        <h5 class="mb-2">Eksport danych</h5>
-        <div class="text-muted small mb-2">Pobierz swoje podstawowe dane profilu i preferencji w formacie JSON.</div>
-        <form method="post" asp-page-handler="ExportData">
-          <button class="btn btn-outline-light">Pobierz JSON</button>
-        </form>
-      </div>
-
-      <!-- Sekcja: usunięcie konta -->
-      <div class="card p-3 mb-3 border-danger">
-        <h5 class="mb-2 text-danger">Usuń konto</h5>
-        <p class="text-muted small mb-2">Operacja nieodwracalna. Aby potwierdzić, wpisz <strong>USUŃ</strong> i kliknij przycisk.</p>
-        <form method="post" asp-page-handler="DeleteAccount" class="d-flex gap-2">
-          <input asp-for="Delete.Confirm" class="form-control" placeholder="USUŃ" style="max-width:200px;" />
-          <button class="btn btn-danger">Usuń konto</button>
-        </form>
-      </div>
-
-      <!-- Sekcja: bezpieczeństwo -->
-      <div class="card p-3">
-        <h5 class="mb-2">Bezpieczeństwo konta</h5>
-        <div class="kv"><span>E-mail</span><span>@Model.Email</span></div>
-        <div class="kv"><span>Hasło ustawione</span><span>@(Model.HasPassword ? "Tak" : "Nie")</span></div>
-        <div class="mt-2 d-flex gap-2">
-          <a class="btn btn-outline-light" asp-page="./Email">Zmień e-mail</a>
-          <a class="btn btn-outline-light" asp-page="./ChangePassword">Zmień hasło</a>
-        </div>
-      </div>
-
-    </div>
-  </div>
 </div>
 
 @section Scripts {
