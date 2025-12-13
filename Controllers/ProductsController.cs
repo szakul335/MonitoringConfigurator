@@ -3,6 +3,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MonitoringConfigurator.Data;
 using MonitoringConfigurator.Models;
+using Microsoft.AspNetCore.Hosting; // Wymagane
+using Microsoft.AspNetCore.Http;    // Wymagane
+using System.IO;                    // Wymagane
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -11,19 +14,19 @@ namespace MonitoringConfigurator.Controllers
     public class ProductsController : Controller
     {
         private readonly AppDbContext _context;
+        private readonly IWebHostEnvironment _env; // Dodano pole środowiska
 
-        public ProductsController(AppDbContext context)
+        public ProductsController(AppDbContext context, IWebHostEnvironment env)
         {
             _context = context;
+            _env = env; // Wstrzykiwanie środowiska
         }
 
         // --- STRONA KATALOGU (Dla wszystkich) ---
         public async Task<IActionResult> Index(ProductCatalogViewModel vm)
         {
-            // 1. Pobranie bazowego zapytania (bez śledzenia zmian dla wydajności)
             var query = _context.Products.AsNoTracking().AsQueryable();
 
-            // 2. Filtrowanie podstawowe (Kategoria, Tekst)
             if (vm.Category.HasValue)
             {
                 query = query.Where(p => p.Category == vm.Category.Value);
@@ -38,7 +41,6 @@ namespace MonitoringConfigurator.Controllers
                     (p.Model != null && p.Model.Contains(q)));
             }
 
-            // 3. Filtrowanie zaawansowane
             if (vm.MinPrice.HasValue)
             {
                 query = query.Where(p => p.Price >= vm.MinPrice.Value);
@@ -59,16 +61,14 @@ namespace MonitoringConfigurator.Controllers
                 query = query.Where(p => p.Outdoor == true);
             }
 
-            // 4. Sortowanie
             query = vm.SortBy switch
             {
                 "price_asc" => query.OrderBy(p => p.Price),
                 "price_desc" => query.OrderByDescending(p => p.Price),
                 "name_desc" => query.OrderByDescending(p => p.Name),
-                _ => query.OrderBy(p => p.Name) // Domyślne sortowanie (A-Z)
+                _ => query.OrderBy(p => p.Name)
             };
 
-            // 5. Wykonanie zapytania i przekazanie wyników do modelu
             vm.Products = await query.ToListAsync();
 
             return View(vm);
@@ -123,6 +123,37 @@ namespace MonitoringConfigurator.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Manage(ProductManagementViewModel viewModel)
         {
+            // --- LOGIKA OBSŁUGI ZDJĘĆ ---
+            var file = viewModel.EditableProduct.ImageUpload;
+            if (file != null && file.Length > 0)
+            {
+                var ext = Path.GetExtension(file.FileName).ToLowerInvariant();
+                if (ext != ".jpg" && ext != ".jpeg" && ext != ".png")
+                {
+                    ModelState.AddModelError("EditableProduct.ImageUpload", "Dozwolone są tylko pliki .jpg i .png");
+                }
+                else
+                {
+                    // Upewnij się, że folder istnieje
+                    var uploadsFolder = Path.Combine(_env.WebRootPath, "uploads", "products");
+                    if (!Directory.Exists(uploadsFolder)) Directory.CreateDirectory(uploadsFolder);
+
+                    // Unikalna nazwa pliku
+                    var uniqueFileName = System.Guid.NewGuid().ToString() + ext;
+                    var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                    // Zapis na dysk
+                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await file.CopyToAsync(stream);
+                    }
+
+                    // Przypisanie ścieżki do modelu (zastępuje stary URL)
+                    viewModel.EditableProduct.ImageUrl = "/uploads/products/" + uniqueFileName;
+                }
+            }
+            // ---------------------------
+
             if (!ModelState.IsValid)
             {
                 viewModel.Products = await BuildFilteredQuery(viewModel.Category, viewModel.Query)
@@ -160,6 +191,16 @@ namespace MonitoringConfigurator.Controllers
         {
             var product = await _context.Products.FindAsync(id);
             if (product == null) return NotFound();
+
+            // Opcjonalnie: Usunięcie pliku z dysku przy usuwaniu produktu
+            if (!string.IsNullOrEmpty(product.ImageUrl) && product.ImageUrl.StartsWith("/uploads/products/"))
+            {
+                var path = Path.Combine(_env.WebRootPath, product.ImageUrl.TrimStart('/'));
+                if (System.IO.File.Exists(path))
+                {
+                    System.IO.File.Delete(path);
+                }
+            }
 
             _context.Products.Remove(product);
             await _context.SaveChangesAsync();

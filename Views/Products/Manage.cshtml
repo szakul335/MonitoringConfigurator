@@ -85,7 +85,8 @@
                                             <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-secondary btn-icon" title="Podgląd">
                                                 <i class="bi bi-eye"></i>
                                             </a>
-                                            <a asp-action="Manage" asp-route-id="@item.Id" asp-route-category="@Model.Category" asp-route-query="@Model.Query" class="btn btn-sm btn-outline-info btn-icon" title="Edytuj">
+                                            <a asp-action="Manage" asp-route-id="@item.Id" asp-route-category="@Model.Category" asp-route-query="@Model.Query"
+                                               class="btn btn-sm btn-outline-info btn-icon" title="Edytuj">
                                                 <i class="bi bi-pencil"></i>
                                             </a>
                                             <form asp-action="Delete" method="post" asp-route-id="@item.Id" class="d-inline" onsubmit="return confirm('Czy na pewno chcesz usunąć produkt: @item.Name?');">
@@ -118,7 +119,7 @@
                 }
             </div>
             <div class="card-body">
-                <form asp-action="Manage" method="post">
+                <form asp-action="Manage" method="post" enctype="multipart/form-data">
                     @Html.AntiForgeryToken()
                     <input type="hidden" asp-for="Category" />
                     <input type="hidden" asp-for="Query" />

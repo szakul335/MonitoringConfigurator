@@ -1,4 +1,6 @@
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.AspNetCore.Http;
 
 namespace MonitoringConfigurator.Models
 {
@@ -41,7 +43,6 @@ namespace MonitoringConfigurator.Models
         [Display(Name = "Kategoria")]
         public ProductCategory Category { get; set; }
 
-
         [Display(Name = "Cena (PLN)")]
         [DataType(DataType.Currency)]
         [Range(0, double.MaxValue, ErrorMessage = "Cena musi być nieujemna.")]
@@ -51,10 +52,7 @@ namespace MonitoringConfigurator.Models
         [Display(Name = "Krótki opis")]
         public string? ShortDescription { get; set; }
 
-
         [StringLength(2000)]
-
-      
         public string? Description { get; set; }
 
         [Display(Name = "Szczegółowy opis")]
@@ -63,6 +61,12 @@ namespace MonitoringConfigurator.Models
         [Url]
         [Display(Name = "Link do zdjęcia")]
         public string? ImageUrl { get; set; }
+
+        // --- NOWE POLE DO UPLOADU ---
+        [NotMapped]
+        [Display(Name = "Wgraj zdjęcie (JPG/PNG)")]
+        public IFormFile? ImageUpload { get; set; }
+        // ----------------------------
 
         [Display(Name = "Rozdzielczość (Mpix)")]
         public int? ResolutionMp { get; set; }

@@ -70,19 +70,11 @@
             background-color: #d63026;
             border-color: #d63026;
         }
-
-    .nav-pills .nav-link.active {
-        background-color: #ff3b30;
-    }
 </style>
 
 <div class="container py-5">
     <div class="row g-4">
-        <div class="col-lg-3">
-            <partial name="_ManageNav" />
-        </div>
-
-        <div class="col-lg-9">
+        <div class="col-12">
             <partial name="_StatusMessage" for="StatusMessage" />
 
             <div class="card card-profile mb-4">
@@ -181,28 +173,14 @@
                 <div class="col-md-6">
                     <div class="card card-profile h-100">
                         <div class="card-body p-4">
-                            <h5 class="mb-3 text-secondary text-uppercase small fw-bold">Ustawienia aplikacji</h5>
-                            <form method="post" asp-page-handler="SavePrefs">
-                                <div class="mb-2">
-                                    <label class="form-label text-muted small">Język interfejsu</label>
-                                    <select asp-for="Prefs.Language" class="form-select">
-                                        <option value="pl">Polski</option>
-                                        <option value="en">English</option>
-                                    </select>
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label text-muted small">Motyw</label>
-                                    <select asp-for="Prefs.Theme" class="form-select">
-                                        <option value="dark">Ciemny (Domyślny)</option>
-                                        <option value="light">Jasny</option>
-                                    </select>
-                                </div>
-                                <div class="form-check form-switch mb-3">
-                                    <input asp-for="Prefs.Newsletter" class="form-check-input" type="checkbox" role="switch">
-                                    <label class="form-check-label" for="Prefs.Newsletter">Newsletter e-mail</label>
-                                </div>
-                                <button class="btn btn-outline-light btn-sm w-100">Zapisz ustawienia</button>
-                            </form>
+                            <h5 class="mb-3 text-secondary text-uppercase small fw-bold">Hasło i zabezpieczenia</h5>
+                            <p class="text-muted small mb-4">
+                                Zadbaj o bezpieczeństwo swojego konta. Zalecamy regularną zmianę hasła na silne i unikalne.
+                            </p>
+
+                            <a asp-page="./ChangePassword" class="btn btn-outline-light w-100 py-2">
+                                <i class="bi bi-shield-lock me-2"></i> Zmień hasło
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -211,13 +189,9 @@
                     <div class="card card-profile h-100 border-danger border-opacity-25">
                         <div class="card-body p-4">
                             <h5 class="mb-3 text-danger text-uppercase small fw-bold">Strefa niebezpieczna</h5>
-                            <p class="small text-muted">Pobierz kopię swoich danych lub trwale usuń konto z serwisu.</p>
+                            <p class="small text-muted">Ta operacja jest nieodwracalna. Wszystkie Twoje dane, konfiguracje i historia zostaną usunięte.</p>
 
-                            <form method="post" asp-page-handler="ExportData" class="mb-3">
-                                <button class="btn btn-outline-secondary btn-sm w-100"><i class="bi bi-download"></i> Pobierz dane (JSON)</button>
-                            </form>
-
-                            <form method="post" asp-page-handler="DeleteAccount">
+                            <form method="post" asp-page-handler="DeleteAccount" class="mt-4">
                                 <div class="input-group input-group-sm">
                                     <input asp-for="Delete.Confirm" class="form-control border-danger text-danger" placeholder="Wpisz: USUŃ" />
                                     <button class="btn btn-danger">Usuń konto</button>
