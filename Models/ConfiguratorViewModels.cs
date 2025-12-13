@@ -20,48 +20,78 @@ namespace MonitoringConfigurator.Models
     public enum InstallationType
     {
         [Display(Name = "Natynkowa (korytka)")] Surface,
-        [Display(Name = "Podtynkowa (bruzdy/sufity)")] Flush
+        [Display(Name = "Podtynkowa (ukryta)")] Flush
+    }
+
+    // --- NOWE ENUMY ---
+    public enum CameraTechnology
+    {
+        [Display(Name = "IP (PoE) - Nowoczesne")] IpPoe,
+        [Display(Name = "Wi-Fi (Bezprzewodowe)")] Wifi,
+        [Display(Name = "Analogowe (CVI/TVI/AHD)")] Analog
+    }
+
+    public enum DetectionType
+    {
+        [Display(Name = "Podstawowa (Ruch)")] Basic,
+        [Display(Name = "Zaawansowana (AI - Ludzie/Pojazdy)")] Ai
+    }
+
+    public enum DisplayType
+    {
+        [Display(Name = "Tylko aplikacja (Brak ekranu)")] AppOnly,
+        [Display(Name = "Monitor dedykowany")] Monitor,
+        [Display(Name = "Telewizor (HDMI)")] Tv
     }
 
     public class ConfiguratorInputModel
     {
-        // --- O OBIEKCIE ---
+        // --- OBIEKT ---
         [Display(Name = "Rodzaj obiektu")]
         public BuildingType Building { get; set; }
 
-        [Display(Name = "Powierzchnia (m²)")]
+        [Display(Name = "Metraż (m²)")]
         [Range(10, 100000)]
         public int AreaM2 { get; set; } = 150;
 
-        [Display(Name = "Typ instalacji")]
+        [Display(Name = "Instalacja")]
         public InstallationType InstallType { get; set; }
 
         // --- KAMERY ---
-        [Display(Name = "Kamery zewnętrzne")]
+        [Display(Name = "Technologia")]
+        public CameraTechnology Tech { get; set; }
+
+        [Display(Name = "Zewnętrzne (szt.)")]
         [Range(0, 128)]
         public int OutdoorCamCount { get; set; } = 4;
 
-        [Display(Name = "Kamery wewnętrzne")]
+        [Display(Name = "Wewnętrzne (szt.)")]
         [Range(0, 128)]
         public int IndoorCamCount { get; set; } = 2;
 
         public int TotalCameras => OutdoorCamCount + IndoorCamCount;
 
-        [Display(Name = "Jakość obrazu")]
+        [Display(Name = "Rozdzielczość")]
         public int ResolutionMp { get; set; } = 4;
 
-        [Display(Name = "Archiwizacja (dni)")]
+        [Display(Name = "Widoczność w nocy (IR)")]
+        public int NightVisionM { get; set; } = 30; // np. 20, 30, 50, 80
+
+        [Display(Name = "Rodzaj detekcji")]
+        public DetectionType Detection { get; set; }
+
+        // --- INNE ---
+        [Display(Name = "Czas archiwizacji (dni)")]
         [Range(1, 90)]
         public int RecordingDays { get; set; } = 14;
 
-        // --- DODATKI ---
-        [Display(Name = "Zasilanie PoE")]
-        public bool NeedPoE { get; set; } = true;
+        [Display(Name = "Wyświetlanie obrazu")]
+        public DisplayType DisplayMethod { get; set; }
 
-        [Display(Name = "Okablowanie")]
+        [Display(Name = "Dodać okablowanie?")]
         public bool NeedCabling { get; set; } = true;
 
-        [Display(Name = "Zasilanie awaryjne (UPS)")]
+        [Display(Name = "Dodać UPS?")]
         public bool NeedUps { get; set; } = false;
 
         [Display(Name = "Czas podtrzymania (min)")]
@@ -75,29 +105,32 @@ namespace MonitoringConfigurator.Models
     {
         public ConfiguratorInputModel Input { get; set; }
 
-        // Sprzęt główny
+        // Urządzenia
         public Product? SelectedOutdoorCam { get; set; }
         public Product? SelectedIndoorCam { get; set; }
-        public Product? SelectedNvr { get; set; }
-        public int NvrQuantity { get; set; } = 1;
+        public Product? SelectedRecorder { get; set; } // NVR lub DVR
+        public int RecorderQuantity { get; set; } = 1;
         public Product? SelectedSwitch { get; set; }
         public int SwitchQuantity { get; set; }
         public Product? SelectedDisk { get; set; }
         public int DiskQuantity { get; set; }
+        public Product? SelectedMonitor { get; set; } // Monitor/TV
+        public int MonitorQuantity { get; set; }
+
+        // Akcesoria
         public Product? SelectedCable { get; set; }
         public int CableQuantity { get; set; }
+        public Product? SelectedTray { get; set; }
+        public int TrayMeters { get; set; }
+        public Product? SelectedMount { get; set; } // Puszki/Uchwyty
+        public int MountQuantity { get; set; }
+        public Product? SelectedClips { get; set; }
+        public int ClipsQuantity { get; set; }
+        public Product? SelectedScrews { get; set; }
+        public int ScrewsQuantity { get; set; }
+
         public Product? SelectedUps { get; set; }
         public int UpsQuantity { get; set; }
-
-        // Akcesoria montażowe (automatyczne)
-        public Product? SelectedTray { get; set; } // Korytka (dla natynkowej)
-        public int TrayMeters { get; set; }
-
-        public Product? SelectedClips { get; set; } // Uchwyty
-        public int ClipsQuantity { get; set; } // Paczki
-
-        public Product? SelectedScrews { get; set; } // Wkręty
-        public int ScrewsQuantity { get; set; } // Paczki
 
         // Usługa
         public decimal AssemblyCost { get; set; }
@@ -105,18 +138,20 @@ namespace MonitoringConfigurator.Models
         // Statystyki
         public double EstimatedBandwidthMbps { get; set; }
         public double EstimatedStorageTB { get; set; }
-        public int EstimatedPoEBudgetW { get; set; }
+        public int EstimatedPowerW { get; set; }
         public int EstimatedCableMeters { get; set; }
 
         public decimal TotalPrice =>
             ((SelectedOutdoorCam?.Price ?? 0) * Input.OutdoorCamCount) +
             ((SelectedIndoorCam?.Price ?? 0) * Input.IndoorCamCount) +
-            ((SelectedNvr?.Price ?? 0) * NvrQuantity) +
+            ((SelectedRecorder?.Price ?? 0) * RecorderQuantity) +
             ((SelectedSwitch?.Price ?? 0) * SwitchQuantity) +
             ((SelectedDisk?.Price ?? 0) * DiskQuantity) +
+            ((SelectedMonitor?.Price ?? 0) * MonitorQuantity) +
             ((SelectedCable?.Price ?? 0) * CableQuantity) +
             ((SelectedUps?.Price ?? 0) * UpsQuantity) +
             ((SelectedTray?.Price ?? 0) * TrayMeters) +
+            ((SelectedMount?.Price ?? 0) * MountQuantity) +
             ((SelectedClips?.Price ?? 0) * ClipsQuantity) +
             ((SelectedScrews?.Price ?? 0) * ScrewsQuantity) +
             AssemblyCost;
